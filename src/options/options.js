@@ -26,6 +26,10 @@ let addWorkButton, addEducationButton;
 // Templates
 let workEntryTemplate, educationEntryTemplate;
 
+// Resume upload elements
+let resumeDropzone, resumeFileInput, browseButton;
+let parsingStatus, parsingStatusText, parsingResult, parsingResultMessage;
+
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', init);
 
@@ -61,12 +65,28 @@ function init() {
   workEntryTemplate = document.getElementById('work-entry-template');
   educationEntryTemplate = document.getElementById('education-entry-template');
 
+  // Resume upload elements
+  resumeDropzone = document.getElementById('resume-dropzone');
+  resumeFileInput = document.getElementById('resume-file-input');
+  browseButton = document.getElementById('browse-button');
+  parsingStatus = document.getElementById('resume-parsing-status');
+  parsingStatusText = document.getElementById('parsing-status-text');
+  parsingResult = document.getElementById('resume-parsing-result');
+  parsingResultMessage = document.getElementById('parsing-result-message');
+
   // Attach event listeners
   tabs.forEach(tab => tab.addEventListener('click', switchTab));
   saveButton.addEventListener('click', saveProfile);
   clearButton.addEventListener('click', confirmClearProfile);
   addWorkButton.addEventListener('click', addWorkEntry);
   addEducationButton.addEventListener('click', addEducationEntry);
+
+  // Resume upload event listeners
+  browseButton.addEventListener('click', () => resumeFileInput.click());
+  resumeFileInput.addEventListener('change', handleFileSelect);
+  resumeDropzone.addEventListener('dragover', handleDragOver);
+  resumeDropzone.addEventListener('dragleave', handleDragLeave);
+  resumeDropzone.addEventListener('drop', handleDrop);
 
   // Load profile
   loadProfile();
@@ -402,6 +422,156 @@ function showSaveStatus(message, success) {
   setTimeout(() => {
     saveStatus.style.display = 'none';
   }, 5000);
+}
+
+// Resume Upload Handlers
+
+function handleDragOver(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  resumeDropzone.classList.add('dragover');
+}
+
+function handleDragLeave(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  resumeDropzone.classList.remove('dragover');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  resumeDropzone.classList.remove('dragover');
+
+  const files = e.dataTransfer.files;
+  if (files.length > 0) {
+    handleResumeFile(files[0]);
+  }
+}
+
+function handleFileSelect(e) {
+  const files = e.target.files;
+  if (files.length > 0) {
+    handleResumeFile(files[0]);
+  }
+}
+
+async function handleResumeFile(file) {
+  // Validate file type
+  if (!file.type.includes('pdf')) {
+    showParsingResult('Please upload a PDF file', false);
+    return;
+  }
+
+  // Validate file size (max 5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    showParsingResult('File too large. Maximum size is 5MB', false);
+    return;
+  }
+
+  console.log('Processing resume file:', file.name);
+
+  // Show parsing status
+  parsingStatus.style.display = 'flex';
+  parsingResult.style.display = 'none';
+  parsingStatusText.textContent = 'Parsing resume...';
+
+  try {
+    // Send file to background for parsing
+    // Note: We can't send File objects directly via chrome.runtime.sendMessage
+    // So we'll use the FileReader to convert to ArrayBuffer first
+    const arrayBuffer = await file.arrayBuffer();
+
+    // Create a new File object from the array buffer
+    const resumeFile = new File([arrayBuffer], file.name, { type: file.type });
+
+    const response = await chrome.runtime.sendMessage({
+      type: 'PARSE_RESUME',
+      file: resumeFile
+    });
+
+    parsingStatus.style.display = 'none';
+
+    if (response.success) {
+      console.log('Resume parsed successfully:', response.data);
+
+      // Populate form with parsed data
+      populateParsedData(response.data);
+
+      showParsingResult(`Resume parsed successfully! Review and save your profile.`, true);
+    } else {
+      showParsingResult('Failed to parse resume: ' + (response.error || 'Unknown error'), false);
+    }
+  } catch (error) {
+    console.error('Error parsing resume:', error);
+    parsingStatus.style.display = 'none';
+    showParsingResult('Error parsing resume: ' + error.message, false);
+  }
+
+  // Reset file input
+  resumeFileInput.value = '';
+}
+
+function populateParsedData(data) {
+  // Personal Info
+  if (data.personalInfo) {
+    const info = data.personalInfo;
+    if (info.firstName) firstNameInput.value = info.firstName;
+    if (info.lastName) lastNameInput.value = info.lastName;
+    if (info.email) emailInput.value = info.email;
+    if (info.phone) phoneInput.value = info.phone;
+    if (info.city) cityInput.value = info.city;
+    if (info.state) stateInput.value = info.state;
+    if (info.zipCode) zipCodeInput.value = info.zipCode;
+    if (info.linkedin) linkedinInput.value = info.linkedin;
+  }
+
+  // Work Experience
+  if (data.workExperience && data.workExperience.length > 0) {
+    // Clear existing entries
+    workEntriesContainer.innerHTML = '';
+    workEntries = [];
+
+    // Add parsed entries
+    data.workExperience.forEach((work, index) => {
+      addWorkEntry(work, index);
+    });
+  }
+
+  // Education
+  if (data.education && data.education.length > 0) {
+    // Clear existing entries
+    educationEntriesContainer.innerHTML = '';
+    educationEntries = [];
+
+    // Add parsed entries
+    data.education.forEach((edu, index) => {
+      addEducationEntry(edu, index);
+    });
+  }
+
+  // Skills
+  if (data.skills) {
+    if (data.skills.technical && data.skills.technical.length > 0) {
+      technicalSkillsInput.value = data.skills.technical.join(', ');
+    }
+    if (data.skills.summary) {
+      skillsSummaryInput.value = data.skills.summary;
+    }
+  }
+
+  console.log('Form populated with parsed data');
+}
+
+function showParsingResult(message, success) {
+  parsingResult.style.display = 'block';
+  parsingResult.className = 'parsing-result ' + (success ? 'success' : 'error');
+  parsingResultMessage.textContent = message;
+
+  // Hide after 10 seconds
+  setTimeout(() => {
+    parsingResult.style.display = 'none';
+  }, 10000);
 }
 
 console.log('Options script loaded');

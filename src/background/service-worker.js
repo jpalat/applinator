@@ -4,6 +4,7 @@
  */
 
 const StorageManager = require('./storage-manager.js');
+const ResumeParser = require('./resume-parser.js');
 
 // Listen for extension installation
 chrome.runtime.onInstalled.addListener((details) => {
@@ -53,6 +54,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       handleClearProfile(sendResponse);
       return true; // Async response
 
+    case 'PARSE_RESUME':
+      handleParseResume(request.file, sendResponse);
+      return true; // Async response
+
     default:
       console.warn('Unknown message type:', request.type);
       sendResponse({ success: false, error: 'Unknown message type' });
@@ -96,6 +101,27 @@ async function handleClearProfile(sendResponse) {
     sendResponse({ success });
   } catch (error) {
     console.error('Error in handleClearProfile:', error);
+    sendResponse({ success: false, error: error.message });
+  }
+}
+
+async function handleParseResume(file, sendResponse) {
+  try {
+    console.log('Parsing resume file:', file?.name);
+
+    if (!file) {
+      sendResponse({ success: false, error: 'No file provided' });
+      return;
+    }
+
+    // Parse the resume
+    const parsedData = await ResumeParser.parseResume(file);
+
+    console.log('Resume parsed successfully');
+
+    sendResponse({ success: true, data: parsedData });
+  } catch (error) {
+    console.error('Error in handleParseResume:', error);
     sendResponse({ success: false, error: error.message });
   }
 }

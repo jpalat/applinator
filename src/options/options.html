@@ -25,6 +25,40 @@
       <div id="personal-tab" class="tab-content active">
         <h2>Personal Information</h2>
 
+        <!-- Resume Upload Section -->
+        <div class="resume-upload-section">
+          <h3>Quick Start: Upload Resume</h3>
+          <p class="help-text">Upload your PDF resume to automatically extract and fill your profile information</p>
+
+          <div id="resume-dropzone" class="dropzone">
+            <div class="dropzone-content">
+              <svg class="dropzone-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <p class="dropzone-text">Drag & drop your resume here</p>
+              <p class="dropzone-subtext">or</p>
+              <button type="button" id="browse-button" class="btn btn-secondary">Browse Files</button>
+              <input type="file" id="resume-file-input" accept=".pdf" style="display: none;">
+              <p class="dropzone-hint">PDF files only</p>
+            </div>
+          </div>
+
+          <div id="resume-parsing-status" class="parsing-status" style="display: none;">
+            <div class="spinner"></div>
+            <p id="parsing-status-text">Parsing resume...</p>
+          </div>
+
+          <div id="resume-parsing-result" class="parsing-result" style="display: none;">
+            <p id="parsing-result-message"></p>
+          </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <h3>Or Enter Manually</h3>
+
         <div class="form-group">
           <label for="firstName">First Name *</label>
           <input type="text" id="firstName" required>
