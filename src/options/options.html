@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Autofill - Profile Setup</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Job Autofill - Profile Setup</h1>
+      <p class="subtitle">Configure your job application profile</p>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="personal">Personal Info</button>
+      <button class="tab" data-tab="work">Work Experience</button>
+      <button class="tab" data-tab="education">Education</button>
+      <button class="tab" data-tab="skills">Skills</button>
+    </nav>
+
+    <main>
+      <!-- Personal Info Tab -->
+      <div id="personal-tab" class="tab-content active">
+        <h2>Personal Information</h2>
+
+        <div class="form-group">
+          <label for="firstName">First Name *</label>
+          <input type="text" id="firstName" required>
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Last Name *</label>
+          <input type="text" id="lastName" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input type="email" id="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone</label>
+          <input type="tel" id="phone">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="city">City</label>
+            <input type="text" id="city">
+          </div>
+
+          <div class="form-group">
+            <label for="state">State</label>
+            <input type="text" id="state">
+          </div>
+
+          <div class="form-group">
+            <label for="zipCode">Zip Code</label>
+            <input type="text" id="zipCode">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="linkedin">LinkedIn URL</label>
+          <input type="url" id="linkedin" placeholder="https://linkedin.com/in/yourprofile">
+        </div>
+      </div>
+
+      <!-- Work Experience Tab -->
+      <div id="work-tab" class="tab-content">
+        <h2>Work Experience</h2>
+        <p class="tab-description">Add your work history (most recent first)</p>
+
+        <div id="work-entries"></div>
+
+        <button id="add-work-button" class="btn btn-secondary">+ Add Work Experience</button>
+      </div>
+
+      <!-- Education Tab -->
+      <div id="education-tab" class="tab-content">
+        <h2>Education</h2>
+        <p class="tab-description">Add your education history</p>
+
+        <div id="education-entries"></div>
+
+        <button id="add-education-button" class="btn btn-secondary">+ Add Education</button>
+      </div>
+
+      <!-- Skills Tab -->
+      <div id="skills-tab" class="tab-content">
+        <h2>Skills</h2>
+
+        <div class="form-group">
+          <label for="technical-skills">Technical Skills</label>
+          <p class="help-text">Enter comma-separated skills (e.g., JavaScript, Python, React)</p>
+          <textarea id="technical-skills" rows="4" placeholder="JavaScript, Python, React, AWS"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="skills-summary">Professional Summary</label>
+          <p class="help-text">Brief summary of your experience and skills</p>
+          <textarea id="skills-summary" rows="6" placeholder="Experienced software engineer with 8 years..."></textarea>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="footer-actions">
+        <button id="save-button" class="btn btn-primary">Save Profile</button>
+        <button id="clear-button" class="btn btn-danger">Clear All Data</button>
+      </div>
+
+      <div id="save-status" class="save-status" style="display: none;"></div>
+    </footer>
+  </div>
+
+  <!-- Work Entry Template -->
+  <template id="work-entry-template">
+    <div class="entry-card work-entry" data-index="">
+      <div class="entry-header">
+        <h3>Work Experience #<span class="entry-number"></span></h3>
+        <button class="btn-remove" title="Remove">×</button>
+      </div>
+
+      <div class="form-group">
+        <label>Company *</label>
+        <input type="text" class="work-company" required>
+      </div>
+
+      <div class="form-group">
+        <label>Position *</label>
+        <input type="text" class="work-position" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Start Date *</label>
+          <input type="month" class="work-start-date" required>
+        </div>
+
+        <div class="form-group">
+          <label>End Date</label>
+          <input type="month" class="work-end-date">
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label>
+            <input type="checkbox" class="work-current">
+            Currently working here
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Location</label>
+        <input type="text" class="work-location" placeholder="San Francisco, CA">
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea class="work-description" rows="3"></textarea>
+      </div>
+    </div>
+  </template>
+
+  <!-- Education Entry Template -->
+  <template id="education-entry-template">
+    <div class="entry-card education-entry" data-index="">
+      <div class="entry-header">
+        <h3>Education #<span class="entry-number"></span></h3>
+        <button class="btn-remove" title="Remove">×</button>
+      </div>
+
+      <div class="form-group">
+        <label>School *</label>
+        <input type="text" class="edu-school" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Degree *</label>
+          <input type="text" class="edu-degree" required placeholder="Bachelor of Science">
+        </div>
+
+        <div class="form-group">
+          <label>Field of Study</label>
+          <input type="text" class="edu-field" placeholder="Computer Science">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Graduation Date</label>
+          <input type="month" class="edu-graduation-date">
+        </div>
+
+        <div class="form-group">
+          <label>GPA (Optional)</label>
+          <input type="text" class="edu-gpa" placeholder="3.8">
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <script src="options.js"></script>
+</body>
+</html>

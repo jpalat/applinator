@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Autofill</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Job Autofill</h1>
+    </header>
+
+    <main id="main-content">
+      <!-- Loading state -->
+      <div id="loading-state" class="state">
+        <p>Loading...</p>
+      </div>
+
+      <!-- No profile state -->
+      <div id="no-profile-state" class="state" style="display: none;">
+        <p class="message">No profile found. Create your profile first.</p>
+        <button id="setup-button" class="btn btn-primary">Setup Profile</button>
+      </div>
+
+      <!-- Profile exists state -->
+      <div id="profile-exists-state" class="state" style="display: none;">
+        <div class="profile-info">
+          <p id="profile-name" class="profile-name"></p>
+          <p id="profile-email" class="profile-email"></p>
+        </div>
+
+        <div class="form-status" id="form-status">
+          <p class="status-text">Checking for forms...</p>
+        </div>
+
+        <div class="actions">
+          <button id="fill-button" class="btn btn-primary" disabled>Fill Form</button>
+          <button id="options-button" class="btn btn-secondary">Edit Profile</button>
+        </div>
+
+        <div id="fill-progress" class="fill-progress" style="display: none;">
+          <div class="progress-bar">
+            <div id="progress-fill" class="progress-fill"></div>
+          </div>
+          <p id="progress-text" class="progress-text">Filling...</p>
+        </div>
+
+        <div id="fill-result" class="fill-result" style="display: none;">
+          <p id="result-message"></p>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p class="version">v1.0.0</p>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
