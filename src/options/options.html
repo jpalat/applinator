@@ -57,6 +57,45 @@
 
         <hr class="section-divider">
 
+        <!-- JSON Upload Section -->
+        <div class="json-upload-section">
+          <h3>Import from JSON</h3>
+          <p class="help-text">Upload a structured JSON file with your profile data or paste JSON directly</p>
+
+          <div class="json-upload-options">
+            <button type="button" id="json-browse-button" class="btn btn-secondary">Upload JSON File</button>
+            <input type="file" id="json-file-input" accept=".json,application/json" style="display: none;">
+
+            <button type="button" id="show-json-paste-button" class="btn btn-secondary">Paste JSON</button>
+          </div>
+
+          <div id="json-paste-area" class="json-paste-container" style="display: none;">
+            <textarea id="json-input" placeholder="Paste your JSON profile data here..." rows="10"></textarea>
+            <div class="json-actions">
+              <button type="button" id="import-json-button" class="btn btn-primary">Import JSON</button>
+              <button type="button" id="cancel-json-button" class="btn btn-secondary">Cancel</button>
+              <button type="button" id="show-schema-button" class="btn btn-secondary">Show Schema Example</button>
+            </div>
+          </div>
+
+          <div id="json-schema-example" class="json-schema-container" style="display: none;">
+            <h4>JSON Schema Example</h4>
+            <pre id="schema-example-content"></pre>
+            <button type="button" id="copy-schema-button" class="btn btn-secondary">Copy to Clipboard</button>
+          </div>
+
+          <div id="json-import-status" class="parsing-status" style="display: none;">
+            <div class="spinner"></div>
+            <p id="json-import-status-text">Importing JSON...</p>
+          </div>
+
+          <div id="json-import-result" class="parsing-result" style="display: none;">
+            <p id="json-import-result-message"></p>
+          </div>
+        </div>
+
+        <hr class="section-divider">
+
         <h3>Or Enter Manually</h3>
 
         <div class="form-group">

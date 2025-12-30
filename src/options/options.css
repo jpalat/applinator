@@ -410,6 +410,72 @@ footer {
   color: #c62828;
 }
 
+/* JSON Upload Section */
+.json-upload-section {
+  margin-bottom: 24px;
+}
+
+.json-upload-options {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.json-paste-container {
+  margin-top: 16px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #fafafa;
+}
+
+.json-paste-container textarea {
+  width: 100%;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: vertical;
+  min-height: 200px;
+}
+
+.json-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.json-schema-container {
+  margin-top: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #f5f5f5;
+}
+
+.json-schema-container h4 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.json-schema-container pre {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 16px;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
 @media (max-width: 768px) {
   main {
     padding: 16px;

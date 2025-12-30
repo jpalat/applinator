@@ -38,6 +38,12 @@ let workEntryTemplate, educationEntryTemplate;
 let resumeDropzone, resumeFileInput, browseButton;
 let parsingStatus, parsingStatusText, parsingResult, parsingResultMessage;
 
+// JSON upload elements
+let jsonBrowseButton, jsonFileInput, showJsonPasteButton;
+let jsonPasteArea, jsonInput, importJsonButton, cancelJsonButton, showSchemaButton;
+let jsonSchemaExample, schemaExampleContent, copySchemaButton;
+let jsonImportStatus, jsonImportStatusText, jsonImportResult, jsonImportResultMessage;
+
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', init);
 
@@ -82,6 +88,23 @@ function init() {
   parsingResult = document.getElementById('resume-parsing-result');
   parsingResultMessage = document.getElementById('parsing-result-message');
 
+  // JSON upload elements
+  jsonBrowseButton = document.getElementById('json-browse-button');
+  jsonFileInput = document.getElementById('json-file-input');
+  showJsonPasteButton = document.getElementById('show-json-paste-button');
+  jsonPasteArea = document.getElementById('json-paste-area');
+  jsonInput = document.getElementById('json-input');
+  importJsonButton = document.getElementById('import-json-button');
+  cancelJsonButton = document.getElementById('cancel-json-button');
+  showSchemaButton = document.getElementById('show-schema-button');
+  jsonSchemaExample = document.getElementById('json-schema-example');
+  schemaExampleContent = document.getElementById('schema-example-content');
+  copySchemaButton = document.getElementById('copy-schema-button');
+  jsonImportStatus = document.getElementById('json-import-status');
+  jsonImportStatusText = document.getElementById('json-import-status-text');
+  jsonImportResult = document.getElementById('json-import-result');
+  jsonImportResultMessage = document.getElementById('json-import-result-message');
+
   // Attach event listeners
   tabs.forEach(tab => tab.addEventListener('click', switchTab));
   saveButton.addEventListener('click', saveProfile);
@@ -95,6 +118,15 @@ function init() {
   resumeDropzone.addEventListener('dragover', handleDragOver);
   resumeDropzone.addEventListener('dragleave', handleDragLeave);
   resumeDropzone.addEventListener('drop', handleDrop);
+
+  // JSON upload event listeners
+  jsonBrowseButton.addEventListener('click', () => jsonFileInput.click());
+  jsonFileInput.addEventListener('change', handleJsonFileSelect);
+  showJsonPasteButton.addEventListener('click', showJsonPasteArea);
+  importJsonButton.addEventListener('click', importJsonData);
+  cancelJsonButton.addEventListener('click', hideJsonPasteArea);
+  showSchemaButton.addEventListener('click', toggleSchemaExample);
+  copySchemaButton.addEventListener('click', copySchemaToClipboard);
 
   // Load profile
   loadProfile();
@@ -988,6 +1020,253 @@ function showParsingResult(message, success) {
   // Hide after 10 seconds
   setTimeout(() => {
     parsingResult.style.display = 'none';
+  }, 10000);
+}
+
+// JSON Upload Handlers
+
+const PROFILE_SCHEMA_EXAMPLE = {
+  "personalInfo": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john.doe@example.com",
+    "phone": "(555) 123-4567",
+    "city": "San Francisco",
+    "state": "CA",
+    "zipCode": "94102",
+    "linkedin": "https://linkedin.com/in/johndoe"
+  },
+  "workExperience": [
+    {
+      "company": "Tech Corp",
+      "position": "Senior Software Engineer",
+      "startDate": "2020-01",
+      "endDate": "2023-12",
+      "current": false,
+      "location": "San Francisco, CA",
+      "description": "Led development of cloud infrastructure..."
+    },
+    {
+      "company": "Startup Inc",
+      "position": "Software Engineer",
+      "startDate": "2018-06",
+      "endDate": "",
+      "current": true,
+      "location": "Remote",
+      "description": "Full-stack development..."
+    }
+  ],
+  "education": [
+    {
+      "school": "University of California",
+      "degree": "Bachelor of Science",
+      "field": "Computer Science",
+      "graduationDate": "2018-05",
+      "gpa": "3.8"
+    }
+  ],
+  "skills": {
+    "technical": ["JavaScript", "Python", "React", "Node.js", "AWS", "Docker"],
+    "summary": "Experienced software engineer with 5+ years in full-stack development..."
+  }
+};
+
+function showJsonPasteArea() {
+  jsonPasteArea.style.display = 'block';
+  jsonInput.value = '';
+  jsonImportResult.style.display = 'none';
+  jsonSchemaExample.style.display = 'none';
+}
+
+function hideJsonPasteArea() {
+  jsonPasteArea.style.display = 'none';
+  jsonInput.value = '';
+  jsonImportResult.style.display = 'none';
+  jsonSchemaExample.style.display = 'none';
+}
+
+function toggleSchemaExample() {
+  if (jsonSchemaExample.style.display === 'none') {
+    schemaExampleContent.textContent = JSON.stringify(PROFILE_SCHEMA_EXAMPLE, null, 2);
+    jsonSchemaExample.style.display = 'block';
+  } else {
+    jsonSchemaExample.style.display = 'none';
+  }
+}
+
+async function copySchemaToClipboard() {
+  try {
+    const schemaText = JSON.stringify(PROFILE_SCHEMA_EXAMPLE, null, 2);
+    await navigator.clipboard.writeText(schemaText);
+
+    // Show feedback
+    const originalText = copySchemaButton.textContent;
+    copySchemaButton.textContent = 'Copied!';
+    setTimeout(() => {
+      copySchemaButton.textContent = originalText;
+    }, 2000);
+  } catch (error) {
+    console.error('Failed to copy schema:', error);
+    showJsonImportResult('Failed to copy to clipboard', false);
+  }
+}
+
+async function handleJsonFileSelect(e) {
+  const files = e.target.files;
+  if (files.length > 0) {
+    await handleJsonFile(files[0]);
+  }
+}
+
+async function handleJsonFile(file) {
+  // Validate file type
+  if (!file.name.endsWith('.json')) {
+    showJsonImportResult('Please upload a JSON file', false);
+    return;
+  }
+
+  // Validate file size (max 1MB)
+  if (file.size > 1024 * 1024) {
+    showJsonImportResult('File too large. Maximum size is 1MB', false);
+    return;
+  }
+
+  console.log('Processing JSON file:', file.name);
+
+  // Show import status
+  jsonImportStatus.style.display = 'flex';
+  jsonImportResult.style.display = 'none';
+  jsonImportStatusText.textContent = 'Importing JSON...';
+
+  try {
+    const text = await file.text();
+    const profileData = JSON.parse(text);
+
+    // Validate and import
+    await processJsonImport(profileData);
+
+  } catch (error) {
+    console.error('Error importing JSON:', error);
+    jsonImportStatus.style.display = 'none';
+    if (error instanceof SyntaxError) {
+      showJsonImportResult('Invalid JSON format: ' + error.message, false);
+    } else {
+      showJsonImportResult('Error importing JSON: ' + error.message, false);
+    }
+  }
+
+  // Reset file input
+  jsonFileInput.value = '';
+}
+
+async function importJsonData() {
+  const jsonText = jsonInput.value.trim();
+
+  if (!jsonText) {
+    showJsonImportResult('Please paste JSON data', false);
+    return;
+  }
+
+  // Show import status
+  jsonImportStatus.style.display = 'flex';
+  jsonImportResult.style.display = 'none';
+  jsonImportStatusText.textContent = 'Importing JSON...';
+
+  try {
+    const profileData = JSON.parse(jsonText);
+
+    // Validate and import
+    await processJsonImport(profileData);
+
+  } catch (error) {
+    console.error('Error importing JSON:', error);
+    jsonImportStatus.style.display = 'none';
+    if (error instanceof SyntaxError) {
+      showJsonImportResult('Invalid JSON format: ' + error.message, false);
+    } else {
+      showJsonImportResult('Error importing JSON: ' + error.message, false);
+    }
+  }
+}
+
+async function processJsonImport(profileData) {
+  // Validate the structure
+  const validationError = validateProfileJson(profileData);
+  if (validationError) {
+    jsonImportStatus.style.display = 'none';
+    showJsonImportResult('Validation error: ' + validationError, false);
+    return;
+  }
+
+  // Import successful - populate the form
+  jsonImportStatus.style.display = 'none';
+  populateParsedData(profileData);
+  showJsonImportResult('JSON imported successfully! Review and save your profile.', true);
+
+  // Hide paste area on success
+  hideJsonPasteArea();
+
+  console.log('JSON imported successfully:', profileData);
+}
+
+function validateProfileJson(data) {
+  // Check if data is an object
+  if (typeof data !== 'object' || data === null) {
+    return 'Profile data must be an object';
+  }
+
+  // Validate personalInfo if present
+  if (data.personalInfo && typeof data.personalInfo !== 'object') {
+    return 'personalInfo must be an object';
+  }
+
+  // Validate workExperience if present
+  if (data.workExperience) {
+    if (!Array.isArray(data.workExperience)) {
+      return 'workExperience must be an array';
+    }
+    for (let i = 0; i < data.workExperience.length; i++) {
+      const exp = data.workExperience[i];
+      if (typeof exp !== 'object') {
+        return `workExperience[${i}] must be an object`;
+      }
+    }
+  }
+
+  // Validate education if present
+  if (data.education) {
+    if (!Array.isArray(data.education)) {
+      return 'education must be an array';
+    }
+    for (let i = 0; i < data.education.length; i++) {
+      const edu = data.education[i];
+      if (typeof edu !== 'object') {
+        return `education[${i}] must be an object`;
+      }
+    }
+  }
+
+  // Validate skills if present
+  if (data.skills) {
+    if (typeof data.skills !== 'object') {
+      return 'skills must be an object';
+    }
+    if (data.skills.technical && !Array.isArray(data.skills.technical)) {
+      return 'skills.technical must be an array';
+    }
+  }
+
+  return null; // No errors
+}
+
+function showJsonImportResult(message, success) {
+  jsonImportResult.style.display = 'block';
+  jsonImportResult.className = 'parsing-result ' + (success ? 'success' : 'error');
+  jsonImportResultMessage.textContent = message;
+
+  // Hide after 10 seconds
+  setTimeout(() => {
+    jsonImportResult.style.display = 'none';
   }, 10000);
 }
 
