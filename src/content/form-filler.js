@@ -6,19 +6,7 @@
 const { setFieldValue, highlightElement, scrollIntoView, sleep, generateFieldId, highlightFailedField } = require('../utils/dom-utils.js');
 const { formatDateForInput, formatPhoneNumber } = require('../lib/date-utils.js');
 const DynamicHandler = require('./dynamic-handler.js');
-
-// Import failed fields tracking functions (with fallback for tests)
-let getFailedFieldIds, addFailedFieldId;
-try {
-  const contentScript = require('./content-script.js');
-  getFailedFieldIds = contentScript.getFailedFieldIds;
-  addFailedFieldId = contentScript.addFailedFieldId;
-} catch (e) {
-  // Fallback for tests when content-script isn't loaded
-  let fallbackSet = new Set();
-  getFailedFieldIds = () => fallbackSet;
-  addFailedFieldId = (id) => fallbackSet.add(id);
-}
+const { getFailedFieldIds, addFailedFieldId } = require('./failed-fields-tracker.js');
 
 /**
  * Fill a form with profile data

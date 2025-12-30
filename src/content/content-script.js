@@ -7,23 +7,14 @@ const FormDetector = require('./form-detector.js');
 const { classifyField } = require('./field-classifier.js');
 const DOMUtils = require('../utils/dom-utils.js');
 const FormFiller = require('./form-filler.js');
+const { getFailedFieldIds, addFailedFieldId, clearFailedFieldIds } = require('./failed-fields-tracker.js');
 const { throttle } = DOMUtils;
 
 // State
 let detectedForms = [];
 let currentFormAnalysis = null;
-let failedFieldIds = new Set();
 
 console.log('[JobAutofill] Content script loaded');
-
-// Accessor functions for failed fields
-function getFailedFieldIds() {
-  return failedFieldIds;
-}
-
-function addFailedFieldId(fieldId) {
-  failedFieldIds.add(fieldId);
-}
 
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -179,7 +170,7 @@ async function handleFillForm(sendResponse) {
         fieldsTotal: fillResult.total,
         fieldsSkipped: fillResult.skipped,
         fieldsFailed: fillResult.failed,
-        failedFieldCount: failedFieldIds.size,
+        failedFieldCount: getFailedFieldIds().size,
         message: `Successfully filled ${fillResult.filled} of ${fillResult.total} fields`,
         summary: summary,
         errors: fillResult.errors
@@ -247,11 +238,11 @@ function handleHighlightFields(sendResponse) {
  */
 function handleResetFailedFields(sendResponse) {
   try {
-    const count = failedFieldIds.size;
+    const count = getFailedFieldIds().size;
     console.log(`[JobAutofill] Resetting ${count} failed fields`);
 
     // Clear the failed fields Set
-    failedFieldIds.clear();
+    clearFailedFieldIds();
 
     // Remove all persistent highlights
     DOMUtils.removeFailedHighlights();
@@ -273,7 +264,7 @@ function handleResetFailedFields(sendResponse) {
 function detectFormsOnLoad() {
   try {
     // Clear failed fields on page navigation
-    failedFieldIds.clear();
+    clearFailedFieldIds();
 
     const summary = FormDetector.getFormSummary();
 
@@ -306,7 +297,7 @@ const throttledFormDetection = throttle(() => {
   detectedForms = [];
   currentFormAnalysis = null;
   // Clear failed fields when forms change
-  failedFieldIds.clear();
+  clearFailedFieldIds();
   // Re-detect
   detectFormsOnLoad();
 }, 1000); // Limit to once per second
@@ -356,8 +347,6 @@ if (typeof module !== 'undefined' && module.exports) {
     handleAnalyzeForms,
     handleFillForm,
     handleHighlightFields,
-    handleResetFailedFields,
-    getFailedFieldIds,
-    addFailedFieldId
+    handleResetFailedFields
   };
 }
