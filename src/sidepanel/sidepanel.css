@@ -1,0 +1,279 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-size: 14px;
+  color: #333;
+  background-color: #f5f5f5;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+header {
+  background-color: #4CAF50;
+  color: white;
+  padding: 20px 24px;
+  flex-shrink: 0;
+}
+
+header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 14px;
+  opacity: 0.9;
+  font-weight: 400;
+}
+
+main {
+  flex: 1;
+  overflow-y: auto;
+  background-color: white;
+}
+
+.state {
+  padding: 24px;
+}
+
+/* Loading state */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #4CAF50;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+#loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  text-align: center;
+}
+
+#loading-state p {
+  color: #666;
+}
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  text-align: center;
+}
+
+.empty-icon {
+  color: #9e9e9e;
+  margin-bottom: 20px;
+  stroke-width: 2;
+}
+
+.empty-state h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.empty-state .message {
+  color: #666;
+  margin-bottom: 24px;
+  line-height: 1.5;
+  max-width: 400px;
+}
+
+/* Buttons */
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #45a049;
+}
+
+.btn-secondary {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.btn-secondary:hover {
+  background-color: #e0e0e0;
+}
+
+/* Profile sections */
+.profile-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 24px;
+}
+
+.profile-section {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #fafafa;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #4CAF50;
+}
+
+.profile-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.field-value-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 10px 12px;
+}
+
+.field-value {
+  flex: 1;
+  font-size: 14px;
+  color: #333;
+  word-break: break-word;
+  line-height: 1.5;
+}
+
+.copy-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  transition: all 0.2s;
+}
+
+.copy-btn:hover {
+  background-color: #f0f0f0;
+  color: #4CAF50;
+}
+
+.copy-btn.copied {
+  color: #4CAF50;
+}
+
+.profile-entry {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.profile-entry:last-child {
+  margin-bottom: 0;
+}
+
+.entry-header {
+  font-size: 15px;
+  font-weight: 600;
+  color: #4CAF50;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.empty-message {
+  font-size: 14px;
+  color: #999;
+  text-align: center;
+  padding: 40px 20px;
+  font-style: italic;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  justify-content: center;
+  padding: 20px 24px;
+  border-top: 1px solid #e0e0e0;
+  background-color: #f9f9f9;
+}
+
+/* Footer */
+footer {
+  flex-shrink: 0;
+  padding: 12px 24px;
+  background-color: #f5f5f5;
+  border-top: 1px solid #e0e0e0;
+  text-align: center;
+}
+
+.footer-text {
+  font-size: 12px;
+  color: #999;
+}

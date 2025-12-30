@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile - Job Autofill</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>My Profile</h1>
+      <p class="subtitle">View and copy your job application profile</p>
+    </header>
+
+    <main id="main-content">
+      <!-- Loading state -->
+      <div id="loading-state" class="state">
+        <div class="spinner"></div>
+        <p>Loading profile...</p>
+      </div>
+
+      <!-- No profile state -->
+      <div id="no-profile-state" class="state" style="display: none;">
+        <div class="empty-state">
+          <svg class="empty-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <h2>No Profile Found</h2>
+          <p class="message">Create your profile to start viewing your information here.</p>
+          <button id="setup-button" class="btn btn-primary">Setup Profile</button>
+        </div>
+      </div>
+
+      <!-- Profile view state -->
+      <div id="profile-view-state" class="state" style="display: none;">
+        <div class="profile-sections">
+          <!-- Personal Info Section -->
+          <div class="profile-section">
+            <h2 class="section-title">Personal Information</h2>
+            <div class="profile-fields" id="personal-info-fields">
+              <!-- Fields populated by JS -->
+            </div>
+          </div>
+
+          <!-- Work Experience Section -->
+          <div class="profile-section">
+            <h2 class="section-title">Work Experience</h2>
+            <div id="work-experience-container">
+              <!-- Work entries populated by JS -->
+            </div>
+          </div>
+
+          <!-- Education Section -->
+          <div class="profile-section">
+            <h2 class="section-title">Education</h2>
+            <div id="education-container">
+              <!-- Education entries populated by JS -->
+            </div>
+          </div>
+
+          <!-- Skills Section -->
+          <div class="profile-section">
+            <h2 class="section-title">Skills</h2>
+            <div class="profile-fields" id="skills-fields">
+              <!-- Fields populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="refresh-button" class="btn btn-secondary">Refresh Profile</button>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p class="footer-text">Job Autofill Extension</p>
+    </footer>
+  </div>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>

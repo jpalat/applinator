@@ -12,7 +12,8 @@ module.exports = (env, argv) => {
       background: './src/background/service-worker.js',
       content: './src/content/content-script.js',
       popup: './src/popup/popup.js',
-      options: './src/options/options.js'
+      options: './src/options/options.js',
+      sidepanel: './src/sidepanel/sidepanel.js'
     },
 
     output: {
@@ -45,10 +46,12 @@ module.exports = (env, argv) => {
           // HTML files
           { from: 'src/popup/popup.html', to: 'popup.html' },
           { from: 'src/options/options.html', to: 'options.html' },
+          { from: 'src/sidepanel/sidepanel.html', to: 'sidepanel.html' },
 
           // CSS files
           { from: 'src/popup/popup.css', to: 'popup.css' },
           { from: 'src/options/options.css', to: 'options.css' },
+          { from: 'src/sidepanel/sidepanel.css', to: 'sidepanel.css' },
 
           // Icons
           { from: 'src/assets/icons', to: 'icons', noErrorOnMissing: true },

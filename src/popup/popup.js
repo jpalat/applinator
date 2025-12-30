@@ -378,32 +378,14 @@ function openOptions() {
 }
 
 /**
- * Show profile view with all profile data
+ * Open side panel to view profile
  */
 async function showProfileView() {
   try {
-    // Get profile data
-    const response = await chrome.runtime.sendMessage({ type: 'GET_PROFILE' });
-
-    if (!response.success || !response.profile) {
-      showFillResult(false, 'Failed to load profile');
-      return;
-    }
-
-    const profile = response.profile;
-
-    // Populate all sections
-    populatePersonalInfo(profile.personalInfo || {});
-    populateWorkExperience(profile.workExperience || []);
-    populateEducation(profile.education || []);
-    populateSkills(profile.skills || {});
-
-    // Switch to profile view state
-    profileExistsState.style.display = 'none';
-    profileViewState.style.display = 'block';
+    await chrome.sidePanel.open({ windowId: chrome.windows.WINDOW_ID_CURRENT });
   } catch (error) {
-    console.error('Error loading profile view:', error);
-    showFillResult(false, 'Error loading profile');
+    console.error('Error opening side panel:', error);
+    showFillResult(false, 'Error opening side panel');
   }
 }
 
