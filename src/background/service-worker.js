@@ -55,7 +55,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       return true; // Async response
 
     case 'PARSE_RESUME':
-      handleParseResume(request.file, sendResponse);
+      handleParseResume(request.fileData, sendResponse);
       return true; // Async response
 
     default:
@@ -105,17 +105,17 @@ async function handleClearProfile(sendResponse) {
   }
 }
 
-async function handleParseResume(file, sendResponse) {
+async function handleParseResume(fileData, sendResponse) {
   try {
-    console.log('Parsing resume file:', file?.name);
+    console.log('Parsing resume file:', fileData?.name);
 
-    if (!file) {
-      sendResponse({ success: false, error: 'No file provided' });
+    if (!fileData) {
+      sendResponse({ success: false, error: 'No file data provided' });
       return;
     }
 
     // Parse the resume
-    const parsedData = await ResumeParser.parseResume(file);
+    const parsedData = await ResumeParser.parseResume(fileData);
 
     console.log('Resume parsed successfully');
 

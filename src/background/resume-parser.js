@@ -10,13 +10,13 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL('pdf.worker.min.m
 
 /**
  * Extract text from PDF file
- * @param {File} file - PDF file object
+ * @param {Object} fileData - File data object with arrayBuffer, name, and type
  * @returns {Promise<string>} Extracted text from all pages
  */
-async function extractTextFromPDF(file) {
+async function extractTextFromPDF(fileData) {
   try {
-    // Convert file to ArrayBuffer
-    const arrayBuffer = await file.arrayBuffer();
+    // Get ArrayBuffer from fileData
+    const arrayBuffer = fileData.arrayBuffer;
 
     // Load PDF document
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -47,15 +47,15 @@ async function extractTextFromPDF(file) {
 
 /**
  * Parse resume from PDF file
- * @param {File} file - PDF file object
+ * @param {Object} fileData - File data object with arrayBuffer, name, and type
  * @returns {Promise<Object>} Parsed profile data
  */
-async function parseResume(file) {
+async function parseResume(fileData) {
   try {
     console.log('Starting resume parsing...');
 
     // Extract text from PDF
-    const text = await extractTextFromPDF(file);
+    const text = await extractTextFromPDF(fileData);
 
     if (!text || text.length < 50) {
       throw new Error('PDF appears to be empty or text extraction failed');
