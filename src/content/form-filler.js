@@ -3,9 +3,22 @@
  * Fills form fields with profile data based on classifications
  */
 
-const { setFieldValue, highlightElement, scrollIntoView, sleep } = require('../utils/dom-utils.js');
+const { setFieldValue, highlightElement, scrollIntoView, sleep, generateFieldId, highlightFailedField } = require('../utils/dom-utils.js');
 const { formatDateForInput, formatPhoneNumber } = require('../lib/date-utils.js');
 const DynamicHandler = require('./dynamic-handler.js');
+
+// Import failed fields tracking functions (with fallback for tests)
+let getFailedFieldIds, addFailedFieldId;
+try {
+  const contentScript = require('./content-script.js');
+  getFailedFieldIds = contentScript.getFailedFieldIds;
+  addFailedFieldId = contentScript.addFailedFieldId;
+} catch (e) {
+  // Fallback for tests when content-script isn't loaded
+  let fallbackSet = new Set();
+  getFailedFieldIds = () => fallbackSet;
+  addFailedFieldId = (id) => fallbackSet.add(id);
+}
 
 /**
  * Fill a form with profile data
@@ -152,8 +165,21 @@ async function fillForm(formAnalysis, profile, options = {}) {
 async function fillFieldGroup(classifications, data, category, results, options) {
   const { highlightFields, fillDelay } = options;
 
+  // Get failed fields set
+  const failedFieldIds = getFailedFieldIds();
+
   for (const classification of classifications) {
     results.total++;
+
+    // Generate unique field ID
+    const fieldId = generateFieldId(classification.signals);
+
+    // Skip if field previously failed
+    if (failedFieldIds.has(fieldId)) {
+      console.log(`[FormFiller] Skipping previously failed field: ${classification.fieldType}`);
+      results.skipped++;
+      continue;
+    }
 
     try {
       // Get the value to fill
@@ -195,9 +221,12 @@ async function fillFieldGroup(classifications, data, category, results, options)
         message: error.message
       });
 
-      // Highlight failed field in red
+      // Track as failed field
+      addFailedFieldId(fieldId);
+
+      // Persistent highlight (removed on user interaction)
       if (highlightFields) {
-        highlightElement(classification.element, 2000, '#f44336'); // Red for error
+        highlightFailedField(classification.element, fieldId, '#f44336');
       }
     }
   }

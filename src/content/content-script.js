@@ -12,8 +12,18 @@ const { throttle } = DOMUtils;
 // State
 let detectedForms = [];
 let currentFormAnalysis = null;
+let failedFieldIds = new Set();
 
 console.log('[JobAutofill] Content script loaded');
+
+// Accessor functions for failed fields
+function getFailedFieldIds() {
+  return failedFieldIds;
+}
+
+function addFailedFieldId(fieldId) {
+  failedFieldIds.add(fieldId);
+}
 
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -34,6 +44,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     case 'HIGHLIGHT_FIELDS':
       handleHighlightFields(sendResponse);
+      return true; // Async response
+
+    case 'RESET_FAILED_FIELDS':
+      handleResetFailedFields(sendResponse);
       return true; // Async response
 
     default:
@@ -165,6 +179,7 @@ async function handleFillForm(sendResponse) {
         fieldsTotal: fillResult.total,
         fieldsSkipped: fillResult.skipped,
         fieldsFailed: fillResult.failed,
+        failedFieldCount: failedFieldIds.size,
         message: `Successfully filled ${fillResult.filled} of ${fillResult.total} fields`,
         summary: summary,
         errors: fillResult.errors
@@ -228,10 +243,38 @@ function handleHighlightFields(sendResponse) {
 }
 
 /**
+ * Reset failed fields tracking and remove highlights
+ */
+function handleResetFailedFields(sendResponse) {
+  try {
+    const count = failedFieldIds.size;
+    console.log(`[JobAutofill] Resetting ${count} failed fields`);
+
+    // Clear the failed fields Set
+    failedFieldIds.clear();
+
+    // Remove all persistent highlights
+    DOMUtils.removeFailedHighlights();
+
+    sendResponse({
+      success: true,
+      count: count,
+      message: `Reset ${count} failed field(s)`
+    });
+  } catch (error) {
+    console.error('[JobAutofill] Error resetting failed fields:', error);
+    sendResponse({ success: false, error: error.message });
+  }
+}
+
+/**
  * Detect forms when page loads or changes
  */
 function detectFormsOnLoad() {
   try {
+    // Clear failed fields on page navigation
+    failedFieldIds.clear();
+
     const summary = FormDetector.getFormSummary();
 
     if (summary.hasForm) {
@@ -262,6 +305,8 @@ const throttledFormDetection = throttle(() => {
   // Reset analysis
   detectedForms = [];
   currentFormAnalysis = null;
+  // Clear failed fields when forms change
+  failedFieldIds.clear();
   // Re-detect
   detectFormsOnLoad();
 }, 1000); // Limit to once per second
@@ -310,6 +355,9 @@ if (typeof module !== 'undefined' && module.exports) {
     handleCheckForms,
     handleAnalyzeForms,
     handleFillForm,
-    handleHighlightFields
+    handleHighlightFields,
+    handleResetFailedFields,
+    getFailedFieldIds,
+    addFailedFieldId
   };
 }

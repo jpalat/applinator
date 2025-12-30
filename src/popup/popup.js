@@ -8,9 +8,10 @@ const ErrorHandler = require('../utils/error-handler.js');
 // DOM elements
 let loadingState, noProfileState, profileExistsState, errorState;
 let profileName, profileEmail, formStatus;
-let fillButton, setupButton, optionsButton;
+let fillButton, setupButton, optionsButton, resetFailedButton;
 let fillProgress, progressFill, progressText, fillResult, resultMessage;
 let errorTitle, errorMessage, errorAction;
+let failedFieldsStatus, failedCount;
 
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', init);
@@ -29,6 +30,7 @@ function init() {
   fillButton = document.getElementById('fill-button');
   setupButton = document.getElementById('setup-button');
   optionsButton = document.getElementById('options-button');
+  resetFailedButton = document.getElementById('reset-failed-button');
 
   fillProgress = document.getElementById('fill-progress');
   progressFill = document.getElementById('progress-fill');
@@ -40,10 +42,14 @@ function init() {
   errorMessage = document.getElementById('error-message');
   errorAction = document.getElementById('error-action');
 
+  failedFieldsStatus = document.getElementById('failed-fields-status');
+  failedCount = document.getElementById('failed-count');
+
   // Attach event listeners
   setupButton.addEventListener('click', openOptions);
   optionsButton.addEventListener('click', openOptions);
   fillButton.addEventListener('click', fillForm);
+  resetFailedButton.addEventListener('click', resetFailedFields);
 
   // Load initial state
   loadPopup();
@@ -244,6 +250,17 @@ async function fillForm() {
         const total = response.fieldsTotal || 0;
         const skipped = response.fieldsSkipped || 0;
         const failed = response.fieldsFailed || 0;
+        const failedFieldCountValue = response.failedFieldCount || 0;
+
+        // Update failed fields badge
+        if (failedFieldCountValue > 0) {
+          failedCount.textContent = failedFieldCountValue;
+          failedFieldsStatus.style.display = 'block';
+          resetFailedButton.style.display = 'inline-block';
+        } else {
+          failedFieldsStatus.style.display = 'none';
+          resetFailedButton.style.display = 'none';
+        }
 
         let message;
         if (failed > 0) {
@@ -273,6 +290,52 @@ async function fillForm() {
     ErrorHandler.logError('Popup', 'fillForm', error);
     const errorObj = ErrorHandler.createError('FILL_FAILED', { originalError: error });
     showFillResult(false, errorObj.message);
+  }
+}
+
+async function resetFailedFields() {
+  try {
+    // Get current tab
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+    if (!tab || !tab.id) {
+      showFillResult(false, 'No active tab');
+      return;
+    }
+
+    // Disable reset button temporarily
+    resetFailedButton.disabled = true;
+
+    // Send reset command to content script
+    chrome.tabs.sendMessage(tab.id, { type: 'RESET_FAILED_FIELDS' }, (response) => {
+      if (chrome.runtime.lastError) {
+        const errorType = chrome.runtime.lastError.message.includes('receiving end')
+          ? 'CONTENT_SCRIPT_NOT_LOADED'
+          : 'RESET_FAILED';
+
+        const error = ErrorHandler.createError(errorType);
+        showFillResult(false, error.message);
+        resetFailedButton.disabled = false;
+        return;
+      }
+
+      if (response && response.success) {
+        // Hide badge and button
+        failedFieldsStatus.style.display = 'none';
+        resetFailedButton.style.display = 'none';
+        resetFailedButton.disabled = false;
+
+        // Show success message
+        showFillResult(true, response.message || 'Failed fields reset successfully');
+      } else {
+        showFillResult(false, response?.error || 'Failed to reset fields');
+        resetFailedButton.disabled = false;
+      }
+    });
+  } catch (error) {
+    ErrorHandler.logError('Popup', 'resetFailedFields', error);
+    showFillResult(false, 'Error resetting failed fields');
+    resetFailedButton.disabled = false;
   }
 }
 
