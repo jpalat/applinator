@@ -479,13 +479,14 @@ async function handleResumeFile(file) {
   try {
     // Send file to background for parsing
     // Note: We can't send File objects directly via chrome.runtime.sendMessage
-    // So we convert to ArrayBuffer and send that along with metadata
+    // Convert to Uint8Array so it serializes correctly through message passing
     const arrayBuffer = await file.arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
 
     const response = await chrome.runtime.sendMessage({
       type: 'PARSE_RESUME',
       fileData: {
-        arrayBuffer: arrayBuffer,
+        data: Array.from(uint8Array), // Convert to regular array for message passing
         name: file.name,
         type: file.type
       }

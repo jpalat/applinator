@@ -10,16 +10,16 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL('pdf.worker.min.m
 
 /**
  * Extract text from PDF file
- * @param {Object} fileData - File data object with arrayBuffer, name, and type
+ * @param {Object} fileData - File data object with data array, name, and type
  * @returns {Promise<string>} Extracted text from all pages
  */
 async function extractTextFromPDF(fileData) {
   try {
-    // Get ArrayBuffer from fileData
-    const arrayBuffer = fileData.arrayBuffer;
+    // Convert array back to Uint8Array for pdf.js
+    const uint8Array = new Uint8Array(fileData.data);
 
     // Load PDF document
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const pdf = await pdfjsLib.getDocument({ data: uint8Array }).promise;
 
     console.log(`PDF loaded: ${pdf.numPages} pages`);
 
@@ -47,7 +47,7 @@ async function extractTextFromPDF(fileData) {
 
 /**
  * Parse resume from PDF file
- * @param {Object} fileData - File data object with arrayBuffer, name, and type
+ * @param {Object} fileData - File data object with data array, name, and type
  * @returns {Promise<Object>} Parsed profile data
  */
 async function parseResume(fileData) {
