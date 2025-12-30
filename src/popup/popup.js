@@ -165,9 +165,25 @@ async function fillForm() {
         progressFill.style.width = '100%';
         progressText.textContent = 'Complete!';
 
+        // Build detailed message
+        const filled = response.fieldsFilled || 0;
+        const total = response.fieldsTotal || 0;
+        const skipped = response.fieldsSkipped || 0;
+        const failed = response.fieldsFailed || 0;
+
+        let message = `Successfully filled ${filled} of ${total} fields`;
+
+        if (skipped > 0) {
+          message += ` (${skipped} skipped)`;
+        }
+
+        if (failed > 0) {
+          message += ` (${failed} failed)`;
+        }
+
         setTimeout(() => {
           fillProgress.style.display = 'none';
-          showFillResult(true, `Successfully filled ${response.fieldsFilled || 0} fields`);
+          showFillResult(true, message);
         }, 500);
       } else {
         showFillResult(false, response?.error || 'Failed to fill form');

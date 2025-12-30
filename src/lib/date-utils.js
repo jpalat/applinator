@@ -136,10 +136,66 @@ function getCurrentDate() {
   return `${year}-${month}`;
 }
 
+/**
+ * Format date for HTML input fields (YYYY-MM-DD)
+ * @param {string} dateStr - Date string in various formats
+ * @returns {string} Date in YYYY-MM-DD format for input fields
+ */
+function formatDateForInput(dateStr) {
+  if (!dateStr) return '';
+
+  // Already in YYYY-MM-DD format
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    return dateStr;
+  }
+
+  // YYYY-MM format -> add day
+  if (/^\d{4}-\d{2}$/.test(dateStr)) {
+    return `${dateStr}-01`;
+  }
+
+  // Try to parse and convert
+  const parsed = parseDate(dateStr);
+  if (parsed) {
+    return `${parsed}-01`; // Add day
+  }
+
+  return '';
+}
+
+/**
+ * Format phone number to standard format
+ * @param {string} phoneStr - Phone number string
+ * @returns {string} Formatted phone number
+ */
+function formatPhoneNumber(phoneStr) {
+  if (!phoneStr) return '';
+
+  // Remove all non-numeric characters
+  const digits = phoneStr.replace(/\D/g, '');
+
+  // Format based on length
+  if (digits.length === 10) {
+    // US format: (123) 456-7890
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+  } else if (digits.length === 11 && digits[0] === '1') {
+    // US with country code: +1 (123) 456-7890
+    return `+1 (${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7)}`;
+  } else if (digits.length > 10) {
+    // International: just add dashes every 3-4 digits
+    return digits.replace(/(\d{3})(\d{3})(\d{4})(.*)/, '$1-$2-$3 $4').trim();
+  }
+
+  // Return original if we can't format
+  return phoneStr;
+}
+
 module.exports = {
   parseDate,
   parseDateRange,
   formatDate,
   getCurrentDate,
+  formatDateForInput,
+  formatPhoneNumber,
   MONTHS
 };

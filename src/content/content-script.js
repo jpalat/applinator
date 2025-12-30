@@ -6,6 +6,7 @@
 const FormDetector = require('./form-detector.js');
 const { classifyField } = require('./field-classifier.js');
 const DOMUtils = require('../utils/dom-utils.js');
+const FormFiller = require('./form-filler.js');
 
 // State
 let detectedForms = [];
@@ -113,7 +114,6 @@ function handleAnalyzeForms(sendResponse) {
 
 /**
  * Fill the form with profile data
- * (Enhanced version with classification - full fill logic in Week 5)
  */
 async function handleFillForm(sendResponse) {
   try {
@@ -142,29 +142,41 @@ async function handleFillForm(sendResponse) {
 
     console.log('[JobAutofill] Filling form with', currentFormAnalysis.stats.classified, 'classified fields');
 
-    // TODO: Actual filling logic will be implemented in Week 5
-    // For now, just show what we would fill
+    // Fill the form using FormFiller
+    const fillResult = await FormFiller.fillForm(currentFormAnalysis, profile, {
+      skipWorkHistory: true, // Week 5: skip dynamic work history
+      highlightFields: true,
+      fillDelay: 100
+    });
 
-    const fillSummary = {
-      personalInfo: currentFormAnalysis.grouped.personalInfo.length,
-      workExperience: currentFormAnalysis.grouped.workExperience.length,
-      education: currentFormAnalysis.grouped.education.length,
-      skills: currentFormAnalysis.grouped.skills.length,
-      custom: currentFormAnalysis.grouped.custom.length
-    };
+    if (fillResult.success) {
+      const summary = {
+        personalInfo: currentFormAnalysis.grouped.personalInfo.length,
+        workExperience: currentFormAnalysis.grouped.workExperience.length,
+        education: currentFormAnalysis.grouped.education.length,
+        skills: currentFormAnalysis.grouped.skills.length,
+        custom: currentFormAnalysis.grouped.custom.length
+      };
 
-    console.log('[JobAutofill] Would fill fields:', fillSummary);
-
-    // Simulate fill delay
-    setTimeout(() => {
       sendResponse({
         success: true,
-        fieldsFilled: currentFormAnalysis.stats.classified,
-        fieldsTotal: currentFormAnalysis.fields.length,
-        message: `Detected ${currentFormAnalysis.stats.classified} fields. Actual filling coming in Week 5!`,
-        summary: fillSummary
+        fieldsFilled: fillResult.filled,
+        fieldsTotal: fillResult.total,
+        fieldsSkipped: fillResult.skipped,
+        fieldsFailed: fillResult.failed,
+        message: `Successfully filled ${fillResult.filled} of ${fillResult.total} fields`,
+        summary: summary,
+        errors: fillResult.errors
       });
-    }, 1000);
+    } else {
+      sendResponse({
+        success: false,
+        error: fillResult.error,
+        fieldsFilled: fillResult.filled,
+        fieldsTotal: fillResult.total,
+        errors: fillResult.errors
+      });
+    }
 
   } catch (error) {
     console.error('[JobAutofill] Error filling form:', error);
