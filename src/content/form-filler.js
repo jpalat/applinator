@@ -5,6 +5,7 @@
 
 const { setFieldValue, highlightElement, scrollIntoView, sleep } = require('../utils/dom-utils.js');
 const { formatDateForInput, formatPhoneNumber } = require('../lib/date-utils.js');
+const DynamicHandler = require('./dynamic-handler.js');
 
 /**
  * Fill a form with profile data
@@ -75,23 +76,34 @@ async function fillForm(formAnalysis, profile, options = {}) {
       );
     }
 
-    // Skip work experience for Week 5 (will implement in Week 6)
+    // Fill work experience (dynamic or static)
     if (grouped.workExperience && grouped.workExperience.length > 0) {
       if (skipWorkHistory) {
-        console.log('[FormFiller] Skipping work experience fields (Week 6 feature)');
+        console.log('[FormFiller] Skipping work experience fields (disabled)');
         results.skipped += grouped.workExperience.length;
       } else {
         console.log('[FormFiller] Filling work experience fields...');
-        const workData = profile.workExperience && profile.workExperience.length > 0
-          ? profile.workExperience[0]
-          : {};
-        await fillFieldGroup(
+
+        // Use dynamic handler to fill all work experiences
+        const dynamicResult = await DynamicHandler.fillDynamicWorkExperience(
+          profile.workExperience || [],
           grouped.workExperience,
-          workData,
-          'workExperience',
-          results,
-          { highlightFields, fillDelay }
+          {
+            highlightFields,
+            fillDelay,
+            maxEntries: 5,
+            retryAttempts: 3
+          }
         );
+
+        // Merge results
+        results.total += dynamicResult.total;
+        results.filled += dynamicResult.filled;
+        results.skipped += dynamicResult.skipped;
+        results.failed += dynamicResult.failed;
+        results.errors.push(...dynamicResult.errors);
+
+        console.log(`[FormFiller] Work experience fill complete: ${dynamicResult.entriesCreated} entries created`);
       }
     }
 

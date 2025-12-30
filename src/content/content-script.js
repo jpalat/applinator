@@ -144,7 +144,7 @@ async function handleFillForm(sendResponse) {
 
     // Fill the form using FormFiller
     const fillResult = await FormFiller.fillForm(currentFormAnalysis, profile, {
-      skipWorkHistory: true, // Week 5: skip dynamic work history
+      skipWorkHistory: false, // Week 6: enable dynamic work history
       highlightFields: true,
       fillDelay: 100
     });
