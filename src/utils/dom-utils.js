@@ -332,6 +332,41 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/**
+ * Debounce utility - limits function execution rate
+ * @param {Function} func - Function to debounce
+ * @param {number} wait - Wait time in milliseconds
+ * @returns {Function} Debounced function
+ */
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+/**
+ * Throttle utility - limits function execution frequency
+ * @param {Function} func - Function to throttle
+ * @param {number} limit - Minimum time between executions in milliseconds
+ * @returns {Function} Throttled function
+ */
+function throttle(func, limit) {
+  let inThrottle;
+  return function executedFunction(...args) {
+    if (!inThrottle) {
+      func(...args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+  };
+}
+
 module.exports = {
   extractLabel,
   cleanLabelText,
@@ -346,5 +381,7 @@ module.exports = {
   getFieldType,
   simpleHash,
   waitForElement,
-  sleep
+  sleep,
+  debounce,
+  throttle
 };

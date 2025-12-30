@@ -3,11 +3,14 @@
  * Handles popup UI logic and interactions
  */
 
+const ErrorHandler = require('../utils/error-handler.js');
+
 // DOM elements
-let loadingState, noProfileState, profileExistsState;
+let loadingState, noProfileState, profileExistsState, errorState;
 let profileName, profileEmail, formStatus;
 let fillButton, setupButton, optionsButton;
 let fillProgress, progressFill, progressText, fillResult, resultMessage;
+let errorTitle, errorMessage, errorAction;
 
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', init);
@@ -17,6 +20,7 @@ function init() {
   loadingState = document.getElementById('loading-state');
   noProfileState = document.getElementById('no-profile-state');
   profileExistsState = document.getElementById('profile-exists-state');
+  errorState = document.getElementById('error-state');
 
   profileName = document.getElementById('profile-name');
   profileEmail = document.getElementById('profile-email');
@@ -31,6 +35,10 @@ function init() {
   progressText = document.getElementById('progress-text');
   fillResult = document.getElementById('fill-result');
   resultMessage = document.getElementById('result-message');
+
+  errorTitle = document.getElementById('error-title');
+  errorMessage = document.getElementById('error-message');
+  errorAction = document.getElementById('error-action');
 
   // Attach event listeners
   setupButton.addEventListener('click', openOptions);
@@ -47,7 +55,8 @@ async function loadPopup() {
     const response = await chrome.runtime.sendMessage({ type: 'HAS_PROFILE' });
 
     if (!response.success) {
-      showError('Failed to load profile status');
+      const error = ErrorHandler.createError('PROFILE_LOAD_FAILED');
+      showErrorState(error);
       return;
     }
 
@@ -57,15 +66,53 @@ async function loadPopup() {
       await showProfileExistsState();
     }
   } catch (error) {
-    console.error('Error loading popup:', error);
-    showError('Failed to load extension');
+    ErrorHandler.logError('Popup', 'loadPopup', error);
+
+    const errorType = ErrorHandler.getChromeErrorType();
+    const errorObj = ErrorHandler.createError(errorType, { originalError: error });
+    showErrorState(errorObj);
   }
 }
 
 function showNoProfileState() {
   loadingState.style.display = 'none';
   profileExistsState.style.display = 'none';
+  errorState.style.display = 'none';
   noProfileState.style.display = 'flex';
+}
+
+function showErrorState(error) {
+  loadingState.style.display = 'none';
+  noProfileState.style.display = 'none';
+  profileExistsState.style.display = 'none';
+
+  errorTitle.textContent = error.title;
+  errorMessage.textContent = error.message;
+
+  if (error.action) {
+    errorAction.textContent = error.action;
+    errorAction.style.display = 'block';
+
+    // Attach appropriate action handler
+    errorAction.onclick = () => {
+      if (error.action === 'Open Options' || error.action === 'Manual Entry') {
+        openOptions();
+      } else if (error.action === 'Refresh Page') {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          if (tabs[0]) {
+            chrome.tabs.reload(tabs[0].id);
+          }
+        });
+        window.close();
+      } else if (error.action === 'Retry') {
+        loadPopup();
+      }
+    };
+  } else {
+    errorAction.style.display = 'none';
+  }
+
+  errorState.style.display = 'flex';
 }
 
 async function showProfileExistsState() {
@@ -74,7 +121,8 @@ async function showProfileExistsState() {
     const response = await chrome.runtime.sendMessage({ type: 'GET_PROFILE' });
 
     if (!response.success || !response.profile) {
-      showNoProfileState();
+      const error = ErrorHandler.createError('NO_PROFILE');
+      showErrorState(error);
       return;
     }
 
@@ -92,13 +140,15 @@ async function showProfileExistsState() {
     // Show profile exists state
     loadingState.style.display = 'none';
     noProfileState.style.display = 'none';
+    errorState.style.display = 'none';
     profileExistsState.style.display = 'flex';
 
     // Check for forms on current page
     checkForForms();
   } catch (error) {
-    console.error('Error showing profile state:', error);
-    showError('Failed to load profile');
+    ErrorHandler.logError('Popup', 'showProfileExistsState', error);
+    const errorObj = ErrorHandler.createError('PROFILE_LOAD_FAILED', { originalError: error });
+    showErrorState(errorObj);
   }
 }
 
@@ -117,22 +167,36 @@ async function checkForForms() {
     chrome.tabs.sendMessage(tab.id, { type: 'CHECK_FORMS' }, (response) => {
       if (chrome.runtime.lastError) {
         // Content script not loaded or page not compatible
-        formStatus.querySelector('.status-text').textContent = 'No forms detected on this page';
+        const errorMsg = chrome.runtime.lastError.message || '';
+        if (errorMsg.includes('receiving end does not exist')) {
+          formStatus.querySelector('.status-text').textContent = 'Please refresh the page to enable autofill';
+        } else {
+          formStatus.querySelector('.status-text').textContent = 'No forms detected on this page';
+        }
         fillButton.disabled = true;
         return;
       }
 
       if (response && response.hasForm) {
-        formStatus.querySelector('.status-text').textContent = `Found ${response.fieldCount || 0} fillable fields`;
+        const count = response.fieldCount || 0;
+        const formType = response.formType || 'form';
+        formStatus.querySelector('.status-text').textContent =
+          `Found ${count} fillable fields (${formType})`;
+        formStatus.style.backgroundColor = '#e8f5e9';
+        formStatus.style.borderColor = '#4CAF50';
         fillButton.disabled = false;
       } else {
         formStatus.querySelector('.status-text').textContent = 'No forms detected on this page';
+        formStatus.style.backgroundColor = '#fff3e0';
+        formStatus.style.borderColor = '#ff9800';
         fillButton.disabled = true;
       }
     });
   } catch (error) {
-    console.error('Error checking for forms:', error);
+    ErrorHandler.logError('Popup', 'checkForForms', error);
     formStatus.querySelector('.status-text').textContent = 'Error checking for forms';
+    formStatus.style.backgroundColor = '#ffebee';
+    formStatus.style.borderColor = '#f44336';
     fillButton.disabled = true;
   }
 }
@@ -151,13 +215,23 @@ async function fillForm() {
     fillProgress.style.display = 'block';
     fillResult.style.display = 'none';
     fillButton.disabled = true;
-    progressText.textContent = 'Starting fill...';
-    progressFill.style.width = '20%';
+    progressText.textContent = 'Analyzing form...';
+    progressFill.style.width = '10%';
+
+    // Small delay for UI update
+    await new Promise(resolve => setTimeout(resolve, 100));
+    progressText.textContent = 'Filling fields...';
+    progressFill.style.width = '30%';
 
     // Send fill command to content script
     chrome.tabs.sendMessage(tab.id, { type: 'FILL_FORM' }, (response) => {
       if (chrome.runtime.lastError) {
-        showFillResult(false, 'Failed to fill form: Content script not loaded');
+        const errorType = chrome.runtime.lastError.message.includes('receiving end')
+          ? 'CONTENT_SCRIPT_NOT_LOADED'
+          : 'FILL_FAILED';
+
+        const error = ErrorHandler.createError(errorType);
+        showFillResult(false, error.message);
         return;
       }
 
@@ -171,57 +245,61 @@ async function fillForm() {
         const skipped = response.fieldsSkipped || 0;
         const failed = response.fieldsFailed || 0;
 
-        let message = `Successfully filled ${filled} of ${total} fields`;
-
-        if (skipped > 0) {
-          message += ` (${skipped} skipped)`;
-        }
-
+        let message;
         if (failed > 0) {
-          message += ` (${failed} failed)`;
+          message = `Partially filled ${filled} of ${total} fields. ${failed} fields failed.`;
+          setTimeout(() => {
+            fillProgress.style.display = 'none';
+            showFillResult('warning', message);
+          }, 500);
+        } else {
+          message = `Successfully filled ${filled} of ${total} fields`;
+          if (skipped > 0) {
+            message += ` (${skipped} skipped)`;
+          }
+          setTimeout(() => {
+            fillProgress.style.display = 'none';
+            showFillResult(true, message);
+          }, 500);
         }
-
-        setTimeout(() => {
-          fillProgress.style.display = 'none';
-          showFillResult(true, message);
-        }, 500);
       } else {
-        showFillResult(false, response?.error || 'Failed to fill form');
+        const error = ErrorHandler.createError('FILL_FAILED', {
+          customMessage: response?.error || 'Unknown error occurred'
+        });
+        showFillResult(false, error.message);
       }
     });
   } catch (error) {
-    console.error('Error filling form:', error);
-    showFillResult(false, 'Error: ' + error.message);
+    ErrorHandler.logError('Popup', 'fillForm', error);
+    const errorObj = ErrorHandler.createError('FILL_FAILED', { originalError: error });
+    showFillResult(false, errorObj.message);
   }
 }
 
 function showFillResult(success, message) {
   fillProgress.style.display = 'none';
   fillResult.style.display = 'block';
-  fillResult.className = 'fill-result ' + (success ? 'success' : 'error');
+
+  // Handle success, warning, or error
+  if (success === 'warning') {
+    fillResult.className = 'fill-result warning';
+  } else {
+    fillResult.className = 'fill-result ' + (success ? 'success' : 'error');
+  }
+
   resultMessage.textContent = message;
   fillButton.disabled = false;
 
-  // Hide result after 5 seconds
+  // Hide result after 7 seconds (longer for warnings/errors)
+  const hideDelay = success === true ? 5000 : 7000;
   setTimeout(() => {
     fillResult.style.display = 'none';
-  }, 5000);
+  }, hideDelay);
 }
 
 function openOptions() {
   chrome.runtime.openOptionsPage();
   window.close();
-}
-
-function showError(message) {
-  loadingState.style.display = 'none';
-  noProfileState.style.display = 'none';
-  profileExistsState.style.display = 'flex';
-
-  formStatus.querySelector('.status-text').textContent = message;
-  formStatus.style.backgroundColor = '#ffebee';
-  formStatus.style.borderColor = '#f44336';
-  formStatus.querySelector('.status-text').style.color = '#c62828';
 }
 
 console.log('Popup script loaded');

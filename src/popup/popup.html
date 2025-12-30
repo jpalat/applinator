@@ -15,13 +15,35 @@
     <main id="main-content">
       <!-- Loading state -->
       <div id="loading-state" class="state">
-        <p>Loading...</p>
+        <div class="spinner"></div>
+        <p>Loading extension...</p>
       </div>
 
       <!-- No profile state -->
       <div id="no-profile-state" class="state" style="display: none;">
-        <p class="message">No profile found. Create your profile first.</p>
-        <button id="setup-button" class="btn btn-primary">Setup Profile</button>
+        <div class="empty-state">
+          <svg class="empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <h3>No Profile Found</h3>
+          <p class="message">Create your profile to start autofilling job applications.</p>
+          <button id="setup-button" class="btn btn-primary">Setup Profile</button>
+        </div>
+      </div>
+
+      <!-- Error state -->
+      <div id="error-state" class="state" style="display: none;">
+        <div class="error-display">
+          <svg class="error-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <h3 id="error-title">Error</h3>
+          <p id="error-message"></p>
+          <button id="error-action" class="btn btn-primary" style="display: none;"></button>
+        </div>
       </div>
 
       <!-- Profile exists state -->

@@ -7,6 +7,7 @@ const FormDetector = require('./form-detector.js');
 const { classifyField } = require('./field-classifier.js');
 const DOMUtils = require('../utils/dom-utils.js');
 const FormFiller = require('./form-filler.js');
+const { throttle } = DOMUtils;
 
 // State
 let detectedForms = [];
@@ -255,13 +256,23 @@ function detectFormsOnLoad() {
  */
 let formObserver = null;
 
+// Throttled form re-detection to improve performance
+const throttledFormDetection = throttle(() => {
+  console.log('[JobAutofill] Form changes detected, re-analyzing...');
+  // Reset analysis
+  detectedForms = [];
+  currentFormAnalysis = null;
+  // Re-detect
+  detectFormsOnLoad();
+}, 1000); // Limit to once per second
+
 function watchForFormChanges() {
   // Disconnect existing observer
   if (formObserver) {
     formObserver.disconnect();
   }
 
-  // Create new observer
+  // Create new observer with throttled callback
   formObserver = new MutationObserver((mutations) => {
     // Check if forms were added/modified
     const hasFormChanges = mutations.some(mutation =>
@@ -271,12 +282,7 @@ function watchForFormChanges() {
     );
 
     if (hasFormChanges) {
-      console.log('[JobAutofill] Form changes detected, re-analyzing...');
-      // Reset analysis
-      detectedForms = [];
-      currentFormAnalysis = null;
-      // Re-detect
-      detectFormsOnLoad();
+      throttledFormDetection();
     }
   });
 
