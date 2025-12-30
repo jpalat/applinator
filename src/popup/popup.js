@@ -372,7 +372,9 @@ function openOptions() {
  */
 async function showProfileView() {
   try {
-    await chrome.sidePanel.open({ windowId: chrome.windows.WINDOW_ID_CURRENT });
+    // Get current window and open side panel for it
+    const currentWindow = await chrome.windows.getCurrent();
+    await chrome.sidePanel.open({ windowId: currentWindow.id });
   } catch (error) {
     console.error('Error opening side panel:', error);
     showFillResult(false, 'Error opening side panel');
