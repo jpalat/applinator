@@ -128,10 +128,13 @@ function switchTab(tabName) {
  * Handle accordion clicks
  */
 function handleAccordionClick(e) {
+  // Check if click is on header or collapse button
   const accordionHeader = e.target.closest('.accordion-header');
-  if (!accordionHeader) return;
+  const collapseButton = e.target.closest('.accordion-collapse-btn');
 
-  const accordionEntry = accordionHeader.closest('.accordion-entry');
+  if (!accordionHeader && !collapseButton) return;
+
+  const accordionEntry = (accordionHeader || collapseButton).closest('.accordion-entry');
   if (!accordionEntry) return;
 
   accordionEntry.classList.toggle('open');
@@ -191,6 +194,12 @@ function populateWorkExperience(workExperience) {
             ${createFieldRow('End Date', work.current ? 'Present' : work.endDate)}
             ${createFieldRow('Location', work.location)}
             ${createFieldRow('Description', work.description)}
+            <button class="accordion-collapse-btn" type="button">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="18 15 12 9 6 15"></polyline>
+              </svg>
+              Collapse
+            </button>
           </div>
         </div>
       </div>
@@ -230,6 +239,12 @@ function populateEducation(education) {
             ${createFieldRow('Field of Study', edu.field)}
             ${createFieldRow('Graduation Date', edu.graduationDate)}
             ${createFieldRow('GPA', edu.gpa)}
+            <button class="accordion-collapse-btn" type="button">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="18 15 12 9 6 15"></polyline>
+              </svg>
+              Collapse
+            </button>
           </div>
         </div>
       </div>
