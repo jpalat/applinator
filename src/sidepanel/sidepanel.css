@@ -141,14 +141,71 @@ main {
   background-color: #e0e0e0;
 }
 
-/* Profile sections */
-.profile-sections {
+/* Tabs */
+.tabs {
   display: flex;
-  flex-direction: column;
-  gap: 24px;
-  padding-bottom: 24px;
+  gap: 0;
+  background-color: #f0f0f0;
+  border-bottom: 2px solid #e0e0e0;
+  padding: 0;
+  margin: 0;
 }
 
+.tab-btn {
+  flex: 1;
+  padding: 14px 16px;
+  border: none;
+  background: none;
+  color: #666;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 3px solid transparent;
+  position: relative;
+}
+
+.tab-btn:hover {
+  background-color: #e8e8e8;
+  color: #333;
+}
+
+.tab-btn.active {
+  color: #4CAF50;
+  background-color: white;
+  border-bottom: 3px solid #4CAF50;
+  font-weight: 600;
+}
+
+/* Tab Content */
+.tab-content {
+  position: relative;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.tab-panel {
+  display: none;
+  padding: 24px;
+  animation: fadeIn 0.2s ease-in;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Profile sections */
 .profile-section {
   border: 1px solid #e0e0e0;
   border-radius: 8px;

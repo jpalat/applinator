@@ -35,36 +35,53 @@
 
       <!-- Profile view state -->
       <div id="profile-view-state" class="state" style="display: none;">
-        <div class="profile-sections">
-          <!-- Personal Info Section -->
-          <div class="profile-section">
-            <h2 class="section-title">Personal Information</h2>
-            <div class="profile-fields" id="personal-info-fields">
-              <!-- Fields populated by JS -->
+        <!-- Tab Navigation -->
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="personal-info">Personal Info</button>
+          <button class="tab-btn" data-tab="work-experience">Work</button>
+          <button class="tab-btn" data-tab="education">Education</button>
+          <button class="tab-btn" data-tab="skills">Skills</button>
+        </div>
+
+        <!-- Tab Panels -->
+        <div class="tab-content">
+          <!-- Personal Info Panel -->
+          <div id="personal-info-panel" class="tab-panel active">
+            <div class="profile-section">
+              <h2 class="section-title">Personal Information</h2>
+              <div class="profile-fields" id="personal-info-fields">
+                <!-- Fields populated by JS -->
+              </div>
             </div>
           </div>
 
-          <!-- Work Experience Section -->
-          <div class="profile-section">
-            <h2 class="section-title">Work Experience</h2>
-            <div id="work-experience-container">
-              <!-- Work entries populated by JS -->
+          <!-- Work Experience Panel -->
+          <div id="work-experience-panel" class="tab-panel">
+            <div class="profile-section">
+              <h2 class="section-title">Work Experience</h2>
+              <div id="work-experience-container">
+                <!-- Work entries populated by JS -->
+              </div>
             </div>
           </div>
 
-          <!-- Education Section -->
-          <div class="profile-section">
-            <h2 class="section-title">Education</h2>
-            <div id="education-container">
-              <!-- Education entries populated by JS -->
+          <!-- Education Panel -->
+          <div id="education-panel" class="tab-panel">
+            <div class="profile-section">
+              <h2 class="section-title">Education</h2>
+              <div id="education-container">
+                <!-- Education entries populated by JS -->
+              </div>
             </div>
           </div>
 
-          <!-- Skills Section -->
-          <div class="profile-section">
-            <h2 class="section-title">Skills</h2>
-            <div class="profile-fields" id="skills-fields">
-              <!-- Fields populated by JS -->
+          <!-- Skills Panel -->
+          <div id="skills-panel" class="tab-panel">
+            <div class="profile-section">
+              <h2 class="section-title">Skills</h2>
+              <div class="profile-fields" id="skills-fields">
+                <!-- Fields populated by JS -->
+              </div>
             </div>
           </div>
         </div>

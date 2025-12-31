@@ -30,6 +30,12 @@ function init() {
   refreshButton.addEventListener('click', loadProfile);
   profileViewState.addEventListener('click', handleCopyClick);
 
+  // Attach tab navigation listeners
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+
   // Load profile
   loadProfile();
 }
@@ -91,6 +97,27 @@ function showProfileViewState() {
   loadingState.style.display = 'none';
   noProfileState.style.display = 'none';
   profileViewState.style.display = 'block';
+}
+
+/**
+ * Switch between tabs
+ */
+function switchTab(tabName) {
+  // Remove active class from all tabs and panels
+  const allTabButtons = document.querySelectorAll('.tab-btn');
+  const allTabPanels = document.querySelectorAll('.tab-panel');
+
+  allTabButtons.forEach(btn => btn.classList.remove('active'));
+  allTabPanels.forEach(panel => panel.classList.remove('active'));
+
+  // Add active class to selected tab and panel
+  const selectedButton = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+  const selectedPanel = document.getElementById(`${tabName}-panel`);
+
+  if (selectedButton && selectedPanel) {
+    selectedButton.classList.add('active');
+    selectedPanel.classList.add('active');
+  }
 }
 
 /**
