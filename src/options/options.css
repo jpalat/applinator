@@ -448,6 +448,44 @@ footer {
   flex-wrap: wrap;
 }
 
+/* JSON Schema Section (Import Tab) */
+.json-schema-section {
+  margin-bottom: 32px;
+}
+
+.json-schema-section h3 {
+  color: #4CAF50;
+  margin-bottom: 12px;
+}
+
+.json-schema-display {
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  position: relative;
+}
+
+.json-schema-display pre {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 16px;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.json-schema-display .btn {
+  margin-top: 8px;
+}
+
 .json-schema-container {
   margin-top: 16px;
   border: 1px solid #e0e0e0;

@@ -18,54 +18,13 @@
       <button class="tab" data-tab="work">Work Experience</button>
       <button class="tab" data-tab="education">Education</button>
       <button class="tab" data-tab="skills">Skills</button>
+      <button class="tab" data-tab="import">Import</button>
     </nav>
 
     <main>
       <!-- Personal Info Tab -->
       <div id="personal-tab" class="tab-content active">
         <h2>Personal Information</h2>
-
-
-        <!-- JSON Upload Section -->
-        <div class="json-upload-section">
-          <h3>Import from JSON</h3>
-          <p class="help-text">Upload a structured JSON file with your profile data or paste JSON directly</p>
-
-          <div class="json-upload-options">
-            <button type="button" id="json-browse-button" class="btn btn-secondary">Upload JSON File</button>
-            <input type="file" id="json-file-input" accept=".json,application/json" style="display: none;">
-
-            <button type="button" id="show-json-paste-button" class="btn btn-secondary">Paste JSON</button>
-          </div>
-
-          <div id="json-paste-area" class="json-paste-container" style="display: none;">
-            <textarea id="json-input" placeholder="Paste your JSON profile data here..." rows="10"></textarea>
-            <div class="json-actions">
-              <button type="button" id="import-json-button" class="btn btn-primary">Import JSON</button>
-              <button type="button" id="cancel-json-button" class="btn btn-secondary">Cancel</button>
-              <button type="button" id="show-schema-button" class="btn btn-secondary">Show Schema Example</button>
-            </div>
-          </div>
-
-          <div id="json-schema-example" class="json-schema-container" style="display: none;">
-            <h4>JSON Schema Example</h4>
-            <pre id="schema-example-content"></pre>
-            <button type="button" id="copy-schema-button" class="btn btn-secondary">Copy to Clipboard</button>
-          </div>
-
-          <div id="json-import-status" class="parsing-status" style="display: none;">
-            <div class="spinner"></div>
-            <p id="json-import-status-text">Importing JSON...</p>
-          </div>
-
-          <div id="json-import-result" class="parsing-result" style="display: none;">
-            <p id="json-import-result-message"></p>
-          </div>
-        </div>
-
-        <hr class="section-divider">
-
-        <h3>Or Enter Manually</h3>
 
         <div class="form-group">
           <label for="firstName">First Name *</label>
@@ -144,6 +103,53 @@
           <label for="skills-summary">Professional Summary</label>
           <p class="help-text">Brief summary of your experience and skills</p>
           <textarea id="skills-summary" rows="6" placeholder="Experienced software engineer with 8 years..."></textarea>
+        </div>
+      </div>
+
+      <!-- Import Tab -->
+      <div id="import-tab" class="tab-content">
+        <h2>Import Profile Data</h2>
+        <p class="tab-description">Import your profile from a JSON file or paste JSON data directly</p>
+
+        <!-- JSON Schema Example - Always Visible -->
+        <div class="json-schema-section">
+          <h3>JSON Structure</h3>
+          <p class="help-text">Your JSON file should follow this structure:</p>
+          <div class="json-schema-display">
+            <pre id="schema-example-content"></pre>
+            <button type="button" id="copy-schema-button" class="btn btn-secondary">Copy Schema</button>
+          </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- JSON Upload Section -->
+        <div class="json-upload-section">
+          <h3>Upload or Paste JSON</h3>
+
+          <div class="json-upload-options">
+            <button type="button" id="json-browse-button" class="btn btn-secondary">Upload JSON File</button>
+            <input type="file" id="json-file-input" accept=".json,application/json" style="display: none;">
+
+            <button type="button" id="show-json-paste-button" class="btn btn-secondary">Paste JSON</button>
+          </div>
+
+          <div id="json-paste-area" class="json-paste-container" style="display: none;">
+            <textarea id="json-input" placeholder="Paste your JSON profile data here..." rows="10"></textarea>
+            <div class="json-actions">
+              <button type="button" id="import-json-button" class="btn btn-primary">Import JSON</button>
+              <button type="button" id="cancel-json-button" class="btn btn-secondary">Cancel</button>
+            </div>
+          </div>
+
+          <div id="json-import-status" class="parsing-status" style="display: none;">
+            <div class="spinner"></div>
+            <p id="json-import-status-text">Importing JSON...</p>
+          </div>
+
+          <div id="json-import-result" class="parsing-result" style="display: none;">
+            <p id="json-import-result-message"></p>
+          </div>
         </div>
       </div>
     </main>

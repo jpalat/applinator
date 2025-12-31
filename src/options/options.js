@@ -28,8 +28,8 @@ let workEntryTemplate, educationEntryTemplate;
 
 // JSON upload elements
 let jsonBrowseButton, jsonFileInput, showJsonPasteButton;
-let jsonPasteArea, jsonInput, importJsonButton, cancelJsonButton, showSchemaButton;
-let jsonSchemaExample, schemaExampleContent, copySchemaButton;
+let jsonPasteArea, jsonInput, importJsonButton, cancelJsonButton;
+let schemaExampleContent, copySchemaButton;
 let jsonImportStatus, jsonImportStatusText, jsonImportResult, jsonImportResultMessage;
 
 // Initialize on DOM load
@@ -75,8 +75,6 @@ function init() {
   jsonInput = document.getElementById('json-input');
   importJsonButton = document.getElementById('import-json-button');
   cancelJsonButton = document.getElementById('cancel-json-button');
-  showSchemaButton = document.getElementById('show-schema-button');
-  jsonSchemaExample = document.getElementById('json-schema-example');
   schemaExampleContent = document.getElementById('schema-example-content');
   copySchemaButton = document.getElementById('copy-schema-button');
   jsonImportStatus = document.getElementById('json-import-status');
@@ -97,8 +95,12 @@ function init() {
   showJsonPasteButton.addEventListener('click', showJsonPasteArea);
   importJsonButton.addEventListener('click', importJsonData);
   cancelJsonButton.addEventListener('click', hideJsonPasteArea);
-  showSchemaButton.addEventListener('click', toggleSchemaExample);
   copySchemaButton.addEventListener('click', copySchemaToClipboard);
+
+  // Populate JSON schema example (always visible in Import tab)
+  if (schemaExampleContent) {
+    schemaExampleContent.textContent = JSON.stringify(PROFILE_SCHEMA_EXAMPLE, null, 2);
+  }
 
   // Load profile
   loadProfile();
@@ -487,23 +489,12 @@ function showJsonPasteArea() {
   jsonPasteArea.style.display = 'block';
   jsonInput.value = '';
   jsonImportResult.style.display = 'none';
-  jsonSchemaExample.style.display = 'none';
 }
 
 function hideJsonPasteArea() {
   jsonPasteArea.style.display = 'none';
   jsonInput.value = '';
   jsonImportResult.style.display = 'none';
-  jsonSchemaExample.style.display = 'none';
-}
-
-function toggleSchemaExample() {
-  if (jsonSchemaExample.style.display === 'none') {
-    schemaExampleContent.textContent = JSON.stringify(PROFILE_SCHEMA_EXAMPLE, null, 2);
-    jsonSchemaExample.style.display = 'block';
-  } else {
-    jsonSchemaExample.style.display = 'none';
-  }
 }
 
 async function copySchemaToClipboard() {
