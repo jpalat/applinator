@@ -36,6 +36,10 @@ function init() {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
+  // Attach accordion listeners (using event delegation)
+  workExperienceContainer.addEventListener('click', handleAccordionClick);
+  educationContainer.addEventListener('click', handleAccordionClick);
+
   // Load profile
   loadProfile();
 }
@@ -121,6 +125,19 @@ function switchTab(tabName) {
 }
 
 /**
+ * Handle accordion clicks
+ */
+function handleAccordionClick(e) {
+  const accordionHeader = e.target.closest('.accordion-header');
+  if (!accordionHeader) return;
+
+  const accordionEntry = accordionHeader.closest('.accordion-entry');
+  if (!accordionEntry) return;
+
+  accordionEntry.classList.toggle('open');
+}
+
+/**
  * Populate personal info section
  */
 function populatePersonalInfo(personalInfo) {
@@ -150,17 +167,35 @@ function populateWorkExperience(workExperience) {
     return;
   }
 
-  workExperienceContainer.innerHTML = workExperience.map((work, index) => `
-    <div class="profile-entry">
-      <div class="entry-header">Work Experience #${index + 1}</div>
-      ${createFieldRow('Company', work.company)}
-      ${createFieldRow('Position', work.position)}
-      ${createFieldRow('Start Date', work.startDate)}
-      ${createFieldRow('End Date', work.current ? 'Present' : work.endDate)}
-      ${createFieldRow('Location', work.location)}
-      ${createFieldRow('Description', work.description)}
-    </div>
-  `).join('');
+  workExperienceContainer.innerHTML = workExperience.map((work, index) => {
+    const title = work.position || 'Position';
+    const company = work.company || 'Company';
+    const dateRange = `${work.startDate || ''} - ${work.current ? 'Present' : work.endDate || ''}`.trim();
+
+    return `
+      <div class="accordion-entry">
+        <button class="accordion-header" type="button">
+          <div class="accordion-header-content">
+            <div class="accordion-title">${escapeHtml(title)}</div>
+            <div class="accordion-subtitle">${escapeHtml(company)}${dateRange ? ' • ' + escapeHtml(dateRange) : ''}</div>
+          </div>
+          <svg class="accordion-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="accordion-content">
+          <div class="accordion-content-inner">
+            ${createFieldRow('Company', work.company)}
+            ${createFieldRow('Position', work.position)}
+            ${createFieldRow('Start Date', work.startDate)}
+            ${createFieldRow('End Date', work.current ? 'Present' : work.endDate)}
+            ${createFieldRow('Location', work.location)}
+            ${createFieldRow('Description', work.description)}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
 /**
@@ -172,16 +207,34 @@ function populateEducation(education) {
     return;
   }
 
-  educationContainer.innerHTML = education.map((edu, index) => `
-    <div class="profile-entry">
-      <div class="entry-header">Education #${index + 1}</div>
-      ${createFieldRow('School', edu.school)}
-      ${createFieldRow('Degree', edu.degree)}
-      ${createFieldRow('Field of Study', edu.field)}
-      ${createFieldRow('Graduation Date', edu.graduationDate)}
-      ${createFieldRow('GPA', edu.gpa)}
-    </div>
-  `).join('');
+  educationContainer.innerHTML = education.map((edu, index) => {
+    const degree = edu.degree || 'Degree';
+    const school = edu.school || 'School';
+    const gradDate = edu.graduationDate || '';
+
+    return `
+      <div class="accordion-entry">
+        <button class="accordion-header" type="button">
+          <div class="accordion-header-content">
+            <div class="accordion-title">${escapeHtml(degree)}</div>
+            <div class="accordion-subtitle">${escapeHtml(school)}${gradDate ? ' • ' + escapeHtml(gradDate) : ''}</div>
+          </div>
+          <svg class="accordion-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="accordion-content">
+          <div class="accordion-content-inner">
+            ${createFieldRow('School', edu.school)}
+            ${createFieldRow('Degree', edu.degree)}
+            ${createFieldRow('Field of Study', edu.field)}
+            ${createFieldRow('Graduation Date', edu.graduationDate)}
+            ${createFieldRow('GPA', edu.gpa)}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
 /**
