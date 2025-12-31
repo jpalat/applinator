@@ -54,13 +54,7 @@ module.exports = (env, argv) => {
           { from: 'src/sidepanel/sidepanel.css', to: 'sidepanel.css' },
 
           // Icons
-          { from: 'src/assets/icons', to: 'icons', noErrorOnMissing: true },
-
-          // PDF.js worker
-          {
-            from: 'node_modules/pdfjs-dist/build/pdf.worker.min.mjs',
-            to: 'pdf.worker.min.mjs'
-          }
+          { from: 'src/assets/icons', to: 'icons', noErrorOnMissing: true }
         ]
       })
     ],
