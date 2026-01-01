@@ -137,7 +137,23 @@ function handleAccordionClick(e) {
   const accordionEntry = (accordionHeader || collapseButton).closest('.accordion-entry');
   if (!accordionEntry) return;
 
-  accordionEntry.classList.toggle('open');
+  // If it's the collapse/next button, handle next logic
+  if (collapseButton) {
+    const nextEntry = accordionEntry.nextElementSibling;
+
+    // Close current entry
+    accordionEntry.classList.remove('open');
+
+    // If there's a next entry, open it and scroll to it
+    if (nextEntry && nextEntry.classList.contains('accordion-entry')) {
+      nextEntry.classList.add('open');
+      // Smooth scroll to next entry
+      nextEntry.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  } else {
+    // Header click - just toggle
+    accordionEntry.classList.toggle('open');
+  }
 }
 
 /**
@@ -174,6 +190,7 @@ function populateWorkExperience(workExperience) {
     const title = work.position || 'Position';
     const company = work.company || 'Company';
     const dateRange = `${work.startDate || ''} - ${work.current ? 'Present' : work.endDate || ''}`.trim();
+    const isLast = index === workExperience.length - 1;
 
     return `
       <div class="accordion-entry">
@@ -196,9 +213,9 @@ function populateWorkExperience(workExperience) {
             ${createFieldRow('Description', work.description)}
             <button class="accordion-collapse-btn" type="button">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="18 15 12 9 6 15"></polyline>
+                <polyline points="${isLast ? '18 15 12 9 6 15' : '6 9 12 15 18 9'}"></polyline>
               </svg>
-              Collapse
+              ${isLast ? 'Collapse' : 'Next'}
             </button>
           </div>
         </div>
@@ -220,6 +237,7 @@ function populateEducation(education) {
     const degree = edu.degree || 'Degree';
     const school = edu.school || 'School';
     const gradDate = edu.graduationDate || '';
+    const isLast = index === education.length - 1;
 
     return `
       <div class="accordion-entry">
@@ -241,9 +259,9 @@ function populateEducation(education) {
             ${createFieldRow('GPA', edu.gpa)}
             <button class="accordion-collapse-btn" type="button">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="18 15 12 9 6 15"></polyline>
+                <polyline points="${isLast ? '18 15 12 9 6 15' : '6 9 12 15 18 9'}"></polyline>
               </svg>
-              Collapse
+              ${isLast ? 'Collapse' : 'Next'}
             </button>
           </div>
         </div>
