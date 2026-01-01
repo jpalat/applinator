@@ -141,21 +141,19 @@ function handleAccordionClick(e) {
   if (collapseButton) {
     const nextEntry = accordionEntry.nextElementSibling;
 
-    // If there's a next entry, open it, scroll to it, then close current
+    // If there's a next entry, scroll to current first, then change states
     if (nextEntry && nextEntry.classList.contains('accordion-entry')) {
-      // Open next entry first
-      nextEntry.classList.add('open');
-
-      // Scroll to the top of next entry
-      const header = nextEntry.querySelector('.accordion-header');
-      if (header) {
-        header.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Scroll to the top of current entry first
+      const currentHeader = accordionEntry.querySelector('.accordion-header');
+      if (currentHeader) {
+        currentHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
 
-      // Then close current entry after scroll starts
+      // After scroll completes, change the states
       setTimeout(() => {
         accordionEntry.classList.remove('open');
-      }, 100);
+        nextEntry.classList.add('open');
+      }, 400);
     } else {
       // No next entry, just close current
       accordionEntry.classList.remove('open');
