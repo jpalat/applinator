@@ -240,6 +240,17 @@ function addWorkEntry(data = null, index = null) {
     updateWorkEntryNumbers();
   });
 
+  // Handle collapse buttons
+  const collapseButton = template.querySelector('.btn-collapse');
+  const collapseBottomButton = template.querySelector('.btn-collapse-bottom');
+
+  const toggleCollapse = () => {
+    entryCard.classList.toggle('collapsed');
+  };
+
+  collapseButton.addEventListener('click', toggleCollapse);
+  collapseBottomButton.addEventListener('click', toggleCollapse);
+
   // Append to container
   workEntriesContainer.appendChild(template);
 
@@ -290,6 +301,17 @@ function addEducationEntry(data = null, index = null) {
     educationEntries[entryIndex] = null;
     updateEducationEntryNumbers();
   });
+
+  // Handle collapse buttons
+  const collapseButton = template.querySelector('.btn-collapse');
+  const collapseBottomButton = template.querySelector('.btn-collapse-bottom');
+
+  const toggleCollapse = () => {
+    entryCard.classList.toggle('collapsed');
+  };
+
+  collapseButton.addEventListener('click', toggleCollapse);
+  collapseBottomButton.addEventListener('click', toggleCollapse);
 
   // Append to container
   educationEntriesContainer.appendChild(template);
