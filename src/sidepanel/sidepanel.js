@@ -141,19 +141,24 @@ function handleAccordionClick(e) {
   if (collapseButton) {
     const nextEntry = accordionEntry.nextElementSibling;
 
-    // Close current entry
-    accordionEntry.classList.remove('open');
-
-    // If there's a next entry, open it and scroll to it
+    // If there's a next entry, open it, scroll to it, then close current
     if (nextEntry && nextEntry.classList.contains('accordion-entry')) {
+      // Open next entry first
       nextEntry.classList.add('open');
-      // Wait for animation to start, then scroll to top of next entry
+
+      // Scroll to the top of next entry
+      const header = nextEntry.querySelector('.accordion-header');
+      if (header) {
+        header.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      // Then close current entry after scroll starts
       setTimeout(() => {
-        const header = nextEntry.querySelector('.accordion-header');
-        if (header) {
-          header.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        accordionEntry.classList.remove('open');
       }, 100);
+    } else {
+      // No next entry, just close current
+      accordionEntry.classList.remove('open');
     }
   } else {
     // Header click - just toggle
