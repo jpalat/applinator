@@ -147,8 +147,13 @@ function handleAccordionClick(e) {
     // If there's a next entry, open it and scroll to it
     if (nextEntry && nextEntry.classList.contains('accordion-entry')) {
       nextEntry.classList.add('open');
-      // Smooth scroll to next entry
-      nextEntry.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Wait for animation to start, then scroll to top of next entry
+      setTimeout(() => {
+        const header = nextEntry.querySelector('.accordion-header');
+        if (header) {
+          header.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
     }
   } else {
     // Header click - just toggle
