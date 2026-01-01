@@ -634,6 +634,57 @@ async function processJsonImport(profileData) {
   console.log('JSON imported successfully:', profileData);
 }
 
+function populateParsedData(data) {
+  // Personal Info
+  if (data.personalInfo) {
+    const info = data.personalInfo;
+    if (info.firstName) firstNameInput.value = info.firstName;
+    if (info.lastName) lastNameInput.value = info.lastName;
+    if (info.email) emailInput.value = info.email;
+    if (info.phone) phoneInput.value = info.phone;
+    if (info.city) cityInput.value = info.city;
+    if (info.state) stateInput.value = info.state;
+    if (info.zipCode) zipCodeInput.value = info.zipCode;
+    if (info.linkedin) linkedinInput.value = info.linkedin;
+  }
+
+  // Work Experience
+  if (data.workExperience && data.workExperience.length > 0) {
+    // Clear existing entries
+    workEntriesContainer.innerHTML = '';
+    workEntries = [];
+
+    // Add parsed entries
+    data.workExperience.forEach((work, index) => {
+      addWorkEntry(work, index);
+    });
+  }
+
+  // Education
+  if (data.education && data.education.length > 0) {
+    // Clear existing entries
+    educationEntriesContainer.innerHTML = '';
+    educationEntries = [];
+
+    // Add parsed entries
+    data.education.forEach((edu, index) => {
+      addEducationEntry(edu, index);
+    });
+  }
+
+  // Skills
+  if (data.skills) {
+    if (data.skills.technical && data.skills.technical.length > 0) {
+      technicalSkillsInput.value = data.skills.technical.join(', ');
+    }
+    if (data.skills.summary) {
+      skillsSummaryInput.value = data.skills.summary;
+    }
+  }
+
+  console.log('Form populated with parsed data');
+}
+
 function validateProfileJson(data) {
   // Check if data is an object
   if (typeof data !== 'object' || data === null) {
