@@ -21,7 +21,9 @@
     "url": "https://github.com/jpalat/applinator/issues"
   },
   "homepage": "https://github.com/jpalat/applinator#readme",
-  "dependencies": {},
+  "dependencies": {
+    "pdfjs-dist": "^5.4.530"
+  },
   "devDependencies": {
     "@babel/core": "^7.28.5",
     "@babel/preset-env": "^7.28.5",
