@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Page: iframe Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    .section {
+      margin: 30px 0;
+      padding: 20px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+    }
+    .section h2 {
+      margin-top: 0;
+      color: #666;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    label {
+      font-weight: bold;
+      margin-bottom: 5px;
+      display: block;
+    }
+    input, textarea {
+      padding: 8px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    iframe {
+      border: 2px solid #4CAF50;
+      border-radius: 8px;
+      width: 100%;
+      height: 500px;
+    }
+    .info {
+      background-color: #e3f2fd;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Test Page: iframe Support</h1>
+
+  <div class="info">
+    <strong>Test Instructions:</strong>
+    <ol>
+      <li>Load this page in Chrome with the Job Autofill extension installed</li>
+      <li>Open the extension popup</li>
+      <li>Verify it detects forms in both the main frame and iframe</li>
+      <li>Click "Fill Form" and verify both forms are filled</li>
+      <li>Check console logs for "[JobAutofill] Content script loaded in iframe"</li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <h2>Main Frame Form</h2>
+    <form>
+      <div>
+        <label for="main-field">Main Frame Field:</label>
+        <input type="text" id="main-field" name="mainField" placeholder="This is in the main frame">
+      </div>
+      <div>
+        <label for="main-email">Email:</label>
+        <input type="email" id="main-email" name="email" placeholder="Email in main frame">
+      </div>
+    </form>
+  </div>
+
+  <div class="section">
+    <h2>iframe Form (Below)</h2>
+    <iframe src="test-iframe-form.html"></iframe>
+  </div>
+
+</body>
+</html>

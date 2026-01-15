@@ -8,10 +8,23 @@ Job Autofill is a Chrome extension that intelligently detects and fills job appl
 
 ✅ **Smart Resume Parsing** - Upload your PDF resume and automatically extract your information
 ✅ **Intelligent Field Detection** - Classifies 100+ different field types across job applications
+✅ **iframe Support** - Detects and fills forms inside iframes (common on job sites like Workday, Greenhouse)
 ✅ **Dynamic Work History** - Automatically fills multiple work experiences by clicking "Add Another" buttons
 ✅ **Profile Management** - Store and edit your profile information with an easy-to-use interface
+✅ **Side Panel View** - Quick access to view your profile without opening the options page
 ✅ **Universal Form Support** - Works on most job application sites without site-specific configuration
 ✅ **Privacy First** - All data stored locally on your device, never sent to external servers
+
+## Screenshots
+
+> 📸 Screenshots coming soon! Extension is currently in development.
+
+*Key features to be showcased:*
+- Extension popup with form detection status
+- Profile setup page with resume upload
+- Form filling in action (before/after)
+- Side panel profile viewer
+- iframe detection indicator
 
 ## Installation
 
@@ -55,9 +68,17 @@ Job Autofill is a Chrome extension that intelligently detects and fills job appl
 1. Navigate to a job application page
 2. Click the extension icon
 3. If forms are detected, you'll see "Found X fillable fields"
+   - If the form is in an iframe, you'll see "(in iframe)" indicator
 4. Click "Fill Form"
 5. Watch as the extension automatically fills your information
 6. Review and adjust any fields as needed before submitting
+
+### 3. View Your Profile (Quick Access)
+
+1. Click the extension icon
+2. Click "View Profile" button
+3. Your profile opens in the side panel
+4. Review your information without leaving the page
 
 ## How It Works
 
@@ -73,6 +94,13 @@ The extension uses a 3-stage classification system:
 1. **Exact Match** (95%+ confidence): Matches exact field labels like "First Name", "Email Address"
 2. **Pattern Match** (70-85% confidence): Uses regex patterns to detect variations like "fname", "email_addr"
 3. **Type Hints** (60-70% confidence): Uses HTML input types and autocomplete attributes
+
+### iframe Support
+Many job application sites embed their forms in iframes (Workday, Greenhouse, Lever). The extension:
+- **Detects forms in iframes** automatically
+- **Shows "(in iframe)" indicator** in the popup when forms are in an iframe
+- **Fills forms seamlessly** whether they're in the main page or an iframe
+- **Works with nested iframes** for complex application portals
 
 ### Dynamic Form Handling
 For work experience sections with "Add Another" buttons:
@@ -129,8 +157,10 @@ For work experience sections with "Add Another" buttons:
 - ✅ Review auto-filled data before submitting applications
 - ✅ Keep your profile updated with latest information
 - ✅ Use the extension on standard HTML forms (best compatibility)
+- ✅ Works with forms inside iframes (common on job sites)
 - ⚠️ Some custom form builders may require manual filling
 - ⚠️ File upload fields (resume attachments) are not auto-filled
+- ⚠️ Cross-origin iframes may not be accessible due to browser security
 
 ### Profile Management
 - ✅ Update your profile when you gain new experience
@@ -144,6 +174,8 @@ For work experience sections with "Add Another" buttons:
 - Make sure you're on a page with an actual job application form
 - Try refreshing the page to reload the extension
 - Some forms load dynamically - wait for them to fully load before clicking Fill Form
+- If the form is in an iframe, the extension should detect it automatically
+- For cross-origin iframes (different domain), the extension may not have access due to browser security
 
 ### "Please refresh the page to enable autofill"
 - The extension content script wasn't loaded when the page loaded
@@ -177,7 +209,8 @@ For work experience sections with "Add Another" buttons:
 The extension requires the following permissions:
 - **storage**: To save your profile locally
 - **activeTab**: To detect and fill forms on the current page
-- **host_permissions**: To inject the content script on all websites
+- **sidePanel**: To display your profile in the browser's side panel
+- **host_permissions**: To inject the content script on all websites (including iframes)
 
 ### What We Don't Do
 - ❌ Never collect or store personal data on external servers
@@ -213,11 +246,14 @@ applinator/
 │   ├── content/         # Content scripts (form detection & filling)
 │   ├── popup/           # Extension popup UI
 │   ├── options/         # Options page (profile management)
+│   ├── sidepanel/       # Side panel profile viewer
 │   ├── lib/             # Shared libraries (patterns, utilities)
 │   └── utils/           # Utility functions
 ├── tests/               # Unit tests
 ├── dist/                # Build output (gitignored)
-└── manifest.json        # Extension manifest
+├── manifest.json        # Extension manifest
+├── CLAUDE.md            # Developer documentation
+└── TESTING.md           # Testing guide
 ```
 
 ## Contributing
@@ -230,12 +266,15 @@ This is a personal project, but feedback and bug reports are welcome!
 
 ## Roadmap
 
-### Completed (MVP)
+### Completed (v1.0)
 - ✅ Resume PDF parsing
 - ✅ Field classification (100+ patterns)
 - ✅ Dynamic work history filling
 - ✅ Profile management UI
 - ✅ Error handling and user feedback
+- ✅ iframe support for embedded forms
+- ✅ Side panel profile viewer
+- ✅ Failed field tracking and retry
 
 ### Future Enhancements
 - 🔮 Multiple profile support
