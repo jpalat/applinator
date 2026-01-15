@@ -290,62 +290,6 @@ function simpleHash(str) {
 }
 
 /**
- * Generate unique field ID from signals
- * @param {Object} signals - Field signals from getFieldSignals()
- * @returns {string} Unique field ID
- */
-function generateFieldId(signals) {
-  const signatureString = `${signals.label}|${signals.name}|${signals.id}|${signals.placeholder}|${signals.type}`;
-  return simpleHash(signatureString);
-}
-
-/**
- * Highlight failed field persistently until user interacts
- * @param {HTMLElement} element - Element to highlight
- * @param {string} fieldId - Unique field ID
- * @param {string} color - Highlight color (default: red)
- * @returns {Function} Cleanup function to remove highlight
- */
-function highlightFailedField(element, fieldId, color = '#f44336') {
-  // Mark element with data attribute
-  element.setAttribute('data-failed-field-id', fieldId);
-
-  // Apply persistent styles
-  element.style.outline = `2px solid ${color}`;
-  element.style.backgroundColor = `${color}22`; // 22 is alpha for transparency
-
-  // Create cleanup function
-  const cleanup = () => {
-    element.style.outline = '';
-    element.style.backgroundColor = '';
-    element.removeAttribute('data-failed-field-id');
-    element.removeEventListener('focus', cleanup);
-    element.removeEventListener('input', cleanup);
-    element.removeEventListener('click', cleanup);
-  };
-
-  // Add one-time event listeners for user interaction
-  element.addEventListener('focus', cleanup, { once: true });
-  element.addEventListener('input', cleanup, { once: true });
-  element.addEventListener('click', cleanup, { once: true });
-
-  return cleanup;
-}
-
-/**
- * Remove all failed field highlights from the page
- */
-function removeFailedHighlights() {
-  const failedElements = document.querySelectorAll('[data-failed-field-id]');
-  failedElements.forEach(element => {
-    element.style.outline = '';
-    element.style.backgroundColor = '';
-    element.removeAttribute('data-failed-field-id');
-  });
-  console.log(`[DOMUtils] Removed ${failedElements.length} failed field highlights`);
-}
-
-/**
  * Wait for element to appear in DOM
  * @param {string} selector - CSS selector
  * @param {number} timeout - Timeout in milliseconds
@@ -436,9 +380,6 @@ module.exports = {
   isRequired,
   getFieldType,
   simpleHash,
-  generateFieldId,
-  highlightFailedField,
-  removeFailedHighlights,
   waitForElement,
   sleep,
   debounce,
