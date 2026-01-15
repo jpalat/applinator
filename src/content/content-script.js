@@ -7,7 +7,6 @@ const FormDetector = require('./form-detector.js');
 const { classifyField } = require('./field-classifier.js');
 const DOMUtils = require('../utils/dom-utils.js');
 const FormFiller = require('./form-filler.js');
-const { getFailedFieldIds, addFailedFieldId, clearFailedFieldIds } = require('./failed-fields-tracker.js');
 const { throttle } = DOMUtils;
 
 // State
@@ -15,18 +14,6 @@ let detectedForms = [];
 let currentFormAnalysis = null;
 
 console.log('[JobAutofill] Content script loaded');
-
-// Detect if this script is running in an iframe
-const isInIframe = window.self !== window.top;
-const frameInfo = {
-  isIframe: isInIframe,
-  frameUrl: window.location.href,
-  topUrl: isInIframe ? document.referrer : window.location.href
-};
-
-console.log('[JobAutofill] Content script loaded in',
-  isInIframe ? 'iframe' : 'main frame',
-  'URL:', frameInfo.frameUrl);
 
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -49,10 +36,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       handleHighlightFields(sendResponse);
       return true; // Async response
 
-    case 'RESET_FAILED_FIELDS':
-      handleResetFailedFields(sendResponse);
-      return true; // Async response
-
     default:
       console.warn('[JobAutofill] Unknown message type:', request.type);
       sendResponse({ success: false, error: 'Unknown message type' });
@@ -70,8 +53,7 @@ function handleCheckForms(sendResponse) {
 
     sendResponse({
       success: true,
-      ...summary,
-      frameInfo: frameInfo  // Include frame context
+      ...summary
     });
   } catch (error) {
     console.error('[JobAutofill] Error checking forms:', error);
@@ -183,7 +165,6 @@ async function handleFillForm(sendResponse) {
         fieldsTotal: fillResult.total,
         fieldsSkipped: fillResult.skipped,
         fieldsFailed: fillResult.failed,
-        failedFieldCount: getFailedFieldIds().size,
         message: `Successfully filled ${fillResult.filled} of ${fillResult.total} fields`,
         summary: summary,
         errors: fillResult.errors
@@ -247,50 +228,20 @@ function handleHighlightFields(sendResponse) {
 }
 
 /**
- * Reset failed fields tracking and remove highlights
- */
-function handleResetFailedFields(sendResponse) {
-  try {
-    const count = getFailedFieldIds().size;
-    console.log(`[JobAutofill] Resetting ${count} failed fields`);
-
-    // Clear the failed fields Set
-    clearFailedFieldIds();
-
-    // Remove all persistent highlights
-    DOMUtils.removeFailedHighlights();
-
-    sendResponse({
-      success: true,
-      count: count,
-      message: `Reset ${count} failed field(s)`
-    });
-  } catch (error) {
-    console.error('[JobAutofill] Error resetting failed fields:', error);
-    sendResponse({ success: false, error: error.message });
-  }
-}
-
-/**
  * Detect forms when page loads or changes
  */
 function detectFormsOnLoad() {
   try {
-    // Clear failed fields on page navigation
-    clearFailedFieldIds();
-
     const summary = FormDetector.getFormSummary();
 
     if (summary.hasForm) {
       console.log(`[JobAutofill] Detected ${summary.formCount} form(s) with ${summary.fieldCount} fields`);
       console.log(`[JobAutofill] Form type: ${summary.formType}, Classified: ${summary.classifiedCount}`);
-      console.log(`[JobAutofill] Frame context:`, isInIframe ? 'iframe' : 'main frame');
 
-      // Notify background that forms were detected
+      // Notify background that forms were detected (optional)
       chrome.runtime.sendMessage({
         type: 'FORMS_DETECTED',
-        summary: summary,
-        frameInfo: frameInfo  // Include frame context
+        summary: summary
       }).catch(() => {
         // Ignore errors if background isn't listening
       });
@@ -311,8 +262,6 @@ const throttledFormDetection = throttle(() => {
   // Reset analysis
   detectedForms = [];
   currentFormAnalysis = null;
-  // Clear failed fields when forms change
-  clearFailedFieldIds();
   // Re-detect
   detectFormsOnLoad();
 }, 1000); // Limit to once per second
@@ -361,7 +310,6 @@ if (typeof module !== 'undefined' && module.exports) {
     handleCheckForms,
     handleAnalyzeForms,
     handleFillForm,
-    handleHighlightFields,
-    handleResetFailedFields
+    handleHighlightFields
   };
 }
