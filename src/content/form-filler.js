@@ -3,9 +3,11 @@
  * Fills form fields with profile data based on classifications
  */
 
-const { setFieldValue, highlightElement, scrollIntoView, sleep } = require('../utils/dom-utils.js');
+const { highlightElement, generateFieldId, highlightFailedField, sleep } = require('../utils/dom-utils.js');
 const { formatDateForInput, formatPhoneNumber } = require('../lib/date-utils.js');
 const DynamicHandler = require('./dynamic-handler.js');
+const { getFailedFieldIds, addFailedFieldId } = require('./failed-fields-tracker.js');
+const { fillField } = require('./field-value-setter.js');
 
 /**
  * Fill a form with profile data
@@ -152,8 +154,21 @@ async function fillForm(formAnalysis, profile, options = {}) {
 async function fillFieldGroup(classifications, data, category, results, options) {
   const { highlightFields, fillDelay } = options;
 
+  // Get failed fields set
+  const failedFieldIds = getFailedFieldIds();
+
   for (const classification of classifications) {
     results.total++;
+
+    // Generate unique field ID
+    const fieldId = generateFieldId(classification.signals);
+
+    // Skip if field previously failed
+    if (failedFieldIds.has(fieldId)) {
+      console.log(`[FormFiller] Skipping previously failed field: ${classification.fieldType}`);
+      results.skipped++;
+      continue;
+    }
 
     try {
       // Get the value to fill
@@ -195,9 +210,12 @@ async function fillFieldGroup(classifications, data, category, results, options)
         message: error.message
       });
 
-      // Highlight failed field in red
+      // Track as failed field
+      addFailedFieldId(fieldId);
+
+      // Persistent highlight (removed on user interaction)
       if (highlightFields) {
-        highlightElement(classification.element, 2000, '#f44336'); // Red for error
+        highlightFailedField(classification.element, fieldId, '#f44336');
       }
     }
   }
@@ -314,171 +332,8 @@ function formatValue(value, fieldType) {
   return JSON.stringify(value);
 }
 
-/**
- * Fill a single field with proper handling for different input types
- * @param {HTMLElement} element - Form input element
- * @param {string} value - Value to fill
- * @param {string} fieldType - Field type for context
- */
-async function fillField(element, value, fieldType) {
-  const tagName = element.tagName.toLowerCase();
-  const inputType = element.type ? element.type.toLowerCase() : 'text';
-
-  // Scroll field into view
-  scrollIntoView(element);
-  await sleep(50); // Small delay after scroll
-
-  if (tagName === 'select') {
-    fillSelect(element, value);
-  } else if (tagName === 'textarea') {
-    fillTextarea(element, value);
-  } else if (tagName === 'input') {
-    switch (inputType) {
-      case 'checkbox':
-        fillCheckbox(element, value);
-        break;
-      case 'radio':
-        fillRadio(element, value);
-        break;
-      case 'date':
-      case 'month':
-      case 'week':
-        fillDateInput(element, value);
-        break;
-      case 'number':
-        fillNumberInput(element, value);
-        break;
-      case 'email':
-      case 'tel':
-      case 'url':
-      case 'text':
-      case 'search':
-      default:
-        fillTextInput(element, value);
-        break;
-    }
-  } else {
-    // Unknown element type, try text fill
-    fillTextInput(element, value);
-  }
-}
-
-/**
- * Fill a text input
- */
-function fillTextInput(element, value) {
-  setFieldValue(element, value);
-}
-
-/**
- * Fill a textarea
- */
-function fillTextarea(element, value) {
-  setFieldValue(element, value);
-}
-
-/**
- * Fill a select dropdown
- */
-function fillSelect(element, value) {
-  // Try exact match first
-  let optionFound = false;
-
-  for (const option of element.options) {
-    if (option.value === value || option.text === value) {
-      element.value = option.value;
-      optionFound = true;
-      break;
-    }
-  }
-
-  // Try case-insensitive partial match
-  if (!optionFound) {
-    const valueLower = value.toLowerCase();
-    for (const option of element.options) {
-      if (option.value.toLowerCase().includes(valueLower) ||
-          option.text.toLowerCase().includes(valueLower)) {
-        element.value = option.value;
-        optionFound = true;
-        break;
-      }
-    }
-  }
-
-  if (!optionFound) {
-    console.warn(`[FormFiller] No matching option found for select: "${value}"`);
-  }
-
-  // Trigger change event
-  element.dispatchEvent(new Event('change', { bubbles: true }));
-  element.dispatchEvent(new Event('blur', { bubbles: true }));
-}
-
-/**
- * Fill a checkbox
- */
-function fillCheckbox(element, value) {
-  // Value is truthy -> check it
-  const shouldCheck = (value === true || value === 'true' || value === 'Yes' || value === '1' || value === 1);
-
-  if (element.checked !== shouldCheck) {
-    element.checked = shouldCheck;
-    element.dispatchEvent(new Event('change', { bubbles: true }));
-    element.dispatchEvent(new Event('click', { bubbles: true }));
-  }
-}
-
-/**
- * Fill a radio button
- */
-function fillRadio(element, value) {
-  // Find the radio button with matching value in the same group
-  const name = element.name;
-  const radios = document.querySelectorAll(`input[type="radio"][name="${name}"]`);
-
-  let matched = false;
-  for (const radio of radios) {
-    if (radio.value === value || radio.value.toLowerCase() === value.toLowerCase()) {
-      radio.checked = true;
-      radio.dispatchEvent(new Event('change', { bubbles: true }));
-      radio.dispatchEvent(new Event('click', { bubbles: true }));
-      matched = true;
-      break;
-    }
-  }
-
-  if (!matched) {
-    console.warn(`[FormFiller] No matching radio button found for: "${value}"`);
-  }
-}
-
-/**
- * Fill a date input
- */
-function fillDateInput(element, value) {
-  // Format the date appropriately for date inputs (YYYY-MM-DD)
-  const formattedDate = formatDateForInput(value);
-
-  if (formattedDate) {
-    setFieldValue(element, formattedDate);
-  }
-}
-
-/**
- * Fill a number input
- */
-function fillNumberInput(element, value) {
-  // Extract numbers from the value
-  const numericValue = value.toString().replace(/[^0-9.-]/g, '');
-
-  if (numericValue) {
-    setFieldValue(element, numericValue);
-  }
-}
-
 module.exports = {
   fillForm,
-  fillField,
   getValueForField,
   formatValue
 };
