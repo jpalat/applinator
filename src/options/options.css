@@ -180,6 +180,39 @@ main {
 .entry-header h3 {
   font-size: 18px;
   color: #333;
+  flex: 1;
+}
+
+.entry-header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-collapse {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.btn-collapse:hover {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.btn-collapse svg {
+  transition: transform 0.2s;
+}
+
+.entry-card.collapsed .btn-collapse svg {
+  transform: rotate(-90deg);
 }
 
 .btn-remove {
@@ -198,6 +231,47 @@ main {
 .btn-remove:hover {
   background-color: #d32f2f;
   transform: scale(1.1);
+}
+
+.entry-content {
+  max-height: 1000px;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+  opacity: 1;
+}
+
+.entry-card.collapsed .entry-content {
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.3s ease-in, opacity 0.2s ease-in;
+}
+
+.btn-collapse-bottom {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 16px;
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  color: #666;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  justify-content: center;
+}
+
+.btn-collapse-bottom:hover {
+  background-color: #ebebeb;
+  border-color: #d0d0d0;
+  color: #333;
+}
+
+.btn-collapse-bottom svg {
+  flex-shrink: 0;
 }
 
 .btn {
@@ -446,6 +520,44 @@ footer {
   gap: 8px;
   margin-top: 12px;
   flex-wrap: wrap;
+}
+
+/* JSON Schema Section (Import Tab) */
+.json-schema-section {
+  margin-bottom: 32px;
+}
+
+.json-schema-section h3 {
+  color: #4CAF50;
+  margin-bottom: 12px;
+}
+
+.json-schema-display {
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  position: relative;
+}
+
+.json-schema-display pre {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 16px;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.json-schema-display .btn {
+  margin-top: 8px;
 }
 
 .json-schema-container {

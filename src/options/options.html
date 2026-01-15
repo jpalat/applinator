@@ -18,85 +18,13 @@
       <button class="tab" data-tab="work">Work Experience</button>
       <button class="tab" data-tab="education">Education</button>
       <button class="tab" data-tab="skills">Skills</button>
+      <button class="tab" data-tab="import">Import</button>
     </nav>
 
     <main>
       <!-- Personal Info Tab -->
       <div id="personal-tab" class="tab-content active">
         <h2>Personal Information</h2>
-
-        <!-- Resume Upload Section -->
-        <div class="resume-upload-section">
-          <h3>Quick Start: Upload Resume</h3>
-          <p class="help-text">Upload your PDF resume to automatically extract and fill your profile information</p>
-
-          <div id="resume-dropzone" class="dropzone">
-            <div class="dropzone-content">
-              <svg class="dropzone-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="17 8 12 3 7 8"></polyline>
-                <line x1="12" y1="3" x2="12" y2="15"></line>
-              </svg>
-              <p class="dropzone-text">Drag & drop your resume here</p>
-              <p class="dropzone-subtext">or</p>
-              <button type="button" id="browse-button" class="btn btn-secondary">Browse Files</button>
-              <input type="file" id="resume-file-input" accept=".pdf" style="display: none;">
-              <p class="dropzone-hint">PDF files only</p>
-            </div>
-          </div>
-
-          <div id="resume-parsing-status" class="parsing-status" style="display: none;">
-            <div class="spinner"></div>
-            <p id="parsing-status-text">Parsing resume...</p>
-          </div>
-
-          <div id="resume-parsing-result" class="parsing-result" style="display: none;">
-            <p id="parsing-result-message"></p>
-          </div>
-        </div>
-
-        <hr class="section-divider">
-
-        <!-- JSON Upload Section -->
-        <div class="json-upload-section">
-          <h3>Import from JSON</h3>
-          <p class="help-text">Upload a structured JSON file with your profile data or paste JSON directly</p>
-
-          <div class="json-upload-options">
-            <button type="button" id="json-browse-button" class="btn btn-secondary">Upload JSON File</button>
-            <input type="file" id="json-file-input" accept=".json,application/json" style="display: none;">
-
-            <button type="button" id="show-json-paste-button" class="btn btn-secondary">Paste JSON</button>
-          </div>
-
-          <div id="json-paste-area" class="json-paste-container" style="display: none;">
-            <textarea id="json-input" placeholder="Paste your JSON profile data here..." rows="10"></textarea>
-            <div class="json-actions">
-              <button type="button" id="import-json-button" class="btn btn-primary">Import JSON</button>
-              <button type="button" id="cancel-json-button" class="btn btn-secondary">Cancel</button>
-              <button type="button" id="show-schema-button" class="btn btn-secondary">Show Schema Example</button>
-            </div>
-          </div>
-
-          <div id="json-schema-example" class="json-schema-container" style="display: none;">
-            <h4>JSON Schema Example</h4>
-            <pre id="schema-example-content"></pre>
-            <button type="button" id="copy-schema-button" class="btn btn-secondary">Copy to Clipboard</button>
-          </div>
-
-          <div id="json-import-status" class="parsing-status" style="display: none;">
-            <div class="spinner"></div>
-            <p id="json-import-status-text">Importing JSON...</p>
-          </div>
-
-          <div id="json-import-result" class="parsing-result" style="display: none;">
-            <p id="json-import-result-message"></p>
-          </div>
-        </div>
-
-        <hr class="section-divider">
-
-        <h3>Or Enter Manually</h3>
 
         <div class="form-group">
           <label for="firstName">First Name *</label>
@@ -177,6 +105,53 @@
           <textarea id="skills-summary" rows="6" placeholder="Experienced software engineer with 8 years..."></textarea>
         </div>
       </div>
+
+      <!-- Import Tab -->
+      <div id="import-tab" class="tab-content">
+        <h2>Import Profile Data</h2>
+        <p class="tab-description">Import your profile from a JSON file or paste JSON data directly</p>
+
+        <!-- JSON Schema Example - Always Visible -->
+        <div class="json-schema-section">
+          <h3>JSON Structure</h3>
+          <p class="help-text">Your JSON file should follow this structure:</p>
+          <div class="json-schema-display">
+            <pre id="schema-example-content"></pre>
+            <button type="button" id="copy-schema-button" class="btn btn-secondary">Copy Schema</button>
+          </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- JSON Upload Section -->
+        <div class="json-upload-section">
+          <h3>Upload or Paste JSON</h3>
+
+          <div class="json-upload-options">
+            <button type="button" id="json-browse-button" class="btn btn-secondary">Upload JSON File</button>
+            <input type="file" id="json-file-input" accept=".json,application/json" style="display: none;">
+
+            <button type="button" id="show-json-paste-button" class="btn btn-secondary">Paste JSON</button>
+          </div>
+
+          <div id="json-paste-area" class="json-paste-container" style="display: none;">
+            <textarea id="json-input" placeholder="Paste your JSON profile data here..." rows="10"></textarea>
+            <div class="json-actions">
+              <button type="button" id="import-json-button" class="btn btn-primary">Import JSON</button>
+              <button type="button" id="cancel-json-button" class="btn btn-secondary">Cancel</button>
+            </div>
+          </div>
+
+          <div id="json-import-status" class="parsing-status" style="display: none;">
+            <div class="spinner"></div>
+            <p id="json-import-status-text">Importing JSON...</p>
+          </div>
+
+          <div id="json-import-result" class="parsing-result" style="display: none;">
+            <p id="json-import-result-message"></p>
+          </div>
+        </div>
+      </div>
     </main>
 
     <footer>
@@ -192,48 +167,64 @@
   <!-- Work Entry Template -->
   <template id="work-entry-template">
     <div class="entry-card work-entry" data-index="">
-      <div class="entry-header">
+      <div class="entry-header entry-toggle">
         <h3>Work Experience #<span class="entry-number"></span></h3>
-        <button class="btn-remove" title="Remove">×</button>
+        <div class="entry-header-actions">
+          <button class="btn-collapse" title="Collapse/Expand">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <button class="btn-remove" title="Remove">×</button>
+        </div>
       </div>
 
-      <div class="form-group">
-        <label>Company *</label>
-        <input type="text" class="work-company" required>
-      </div>
-
-      <div class="form-group">
-        <label>Position *</label>
-        <input type="text" class="work-position" required>
-      </div>
-
-      <div class="form-row">
+      <div class="entry-content">
         <div class="form-group">
-          <label>Start Date *</label>
-          <input type="month" class="work-start-date" required>
+          <label>Company *</label>
+          <input type="text" class="work-company" required>
         </div>
 
         <div class="form-group">
-          <label>End Date</label>
-          <input type="month" class="work-end-date">
+          <label>Position *</label>
+          <input type="text" class="work-position" required>
         </div>
 
-        <div class="form-group checkbox-group">
-          <label>
-            <input type="checkbox" class="work-current">
-            Currently working here
-          </label>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Start Date *</label>
+            <input type="month" class="work-start-date" required>
+          </div>
+
+          <div class="form-group">
+            <label>End Date</label>
+            <input type="month" class="work-end-date">
+          </div>
+
+          <div class="form-group checkbox-group">
+            <label>
+              <input type="checkbox" class="work-current">
+              Currently working here
+            </label>
+          </div>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label>Location</label>
-        <input type="text" class="work-location" placeholder="San Francisco, CA">
-      </div>
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" class="work-location" placeholder="San Francisco, CA">
+        </div>
 
-      <div class="form-group">
-        <label>Description</label>
-        <textarea class="work-description" rows="3"></textarea>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea class="work-description" rows="3"></textarea>
+        </div>
+
+        <button class="btn-collapse-bottom" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="18 15 12 9 6 15"></polyline>
+          </svg>
+          Collapse
+        </button>
       </div>
     </div>
   </template>
@@ -241,38 +232,54 @@
   <!-- Education Entry Template -->
   <template id="education-entry-template">
     <div class="entry-card education-entry" data-index="">
-      <div class="entry-header">
+      <div class="entry-header entry-toggle">
         <h3>Education #<span class="entry-number"></span></h3>
-        <button class="btn-remove" title="Remove">×</button>
-      </div>
-
-      <div class="form-group">
-        <label>School *</label>
-        <input type="text" class="edu-school" required>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Degree *</label>
-          <input type="text" class="edu-degree" required placeholder="Bachelor of Science">
-        </div>
-
-        <div class="form-group">
-          <label>Field of Study</label>
-          <input type="text" class="edu-field" placeholder="Computer Science">
+        <div class="entry-header-actions">
+          <button class="btn-collapse" title="Collapse/Expand">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <button class="btn-remove" title="Remove">×</button>
         </div>
       </div>
 
-      <div class="form-row">
+      <div class="entry-content">
         <div class="form-group">
-          <label>Graduation Date</label>
-          <input type="month" class="edu-graduation-date">
+          <label>School *</label>
+          <input type="text" class="edu-school" required>
         </div>
 
-        <div class="form-group">
-          <label>GPA (Optional)</label>
-          <input type="text" class="edu-gpa" placeholder="3.8">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Degree *</label>
+            <input type="text" class="edu-degree" required placeholder="Bachelor of Science">
+          </div>
+
+          <div class="form-group">
+            <label>Field of Study</label>
+            <input type="text" class="edu-field" placeholder="Computer Science">
+          </div>
         </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Graduation Date</label>
+            <input type="month" class="edu-graduation-date">
+          </div>
+
+          <div class="form-group">
+            <label>GPA (Optional)</label>
+            <input type="text" class="edu-gpa" placeholder="3.8">
+          </div>
+        </div>
+
+        <button class="btn-collapse-bottom" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="18 15 12 9 6 15"></polyline>
+          </svg>
+          Collapse
+        </button>
       </div>
     </div>
   </template>
