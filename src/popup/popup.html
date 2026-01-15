@@ -55,13 +55,17 @@
 
         <div class="form-status" id="form-status">
           <p class="status-text">Checking for forms...</p>
+          <div id="failed-fields-status" class="failed-fields-status" style="display: none;">
+            <span class="failed-count" id="failed-count">0</span> failed fields
+          </div>
         </div>
 
         <div class="actions">
           <button id="fill-button" class="btn btn-primary" disabled>Fill Form</button>
           <button id="options-button" class="btn btn-secondary">Edit Profile</button>
+          <button id="view-profile-button" class="btn btn-secondary">View Profile</button>
+          <button id="reset-failed-button" class="btn btn-warning" style="display: none;">Reset Failed Fields</button>
         </div>
-
         <div id="fill-progress" class="fill-progress" style="display: none;">
           <div class="progress-bar">
             <div id="progress-fill" class="progress-fill"></div>
