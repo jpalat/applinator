@@ -3,7 +3,7 @@
  * Handles dynamic sections (work history, education) that require "Add Another" clicks
  */
 
-const { fillField } = require('./field-value-setter.js');
+const { fillField } = require('./form-filler.js');
 const { waitForElement, sleep, highlightElement, scrollIntoView } = require('../utils/dom-utils.js');
 
 /**
