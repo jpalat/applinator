@@ -18,6 +18,9 @@ Thumbs.db
 # Test coverage
 coverage/
 
+# E2E test screenshots
+tests/e2e/screenshots/
+
 # Logs
 *.log
 npm-debug.log*

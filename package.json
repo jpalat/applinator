@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "webpack --mode development --watch",
     "build": "webpack --mode production",
-    "test": "jest",
+    "test": "jest tests/*.test.js",
+    "test:unit": "jest tests/*.test.js --testPathIgnorePatterns=e2e",
+    "test:e2e": "npm run build && jest tests/e2e/*.test.js --runInBand --testTimeout=30000",
+    "test:e2e:watch": "npm run build && jest tests/e2e/*.test.js --watch --runInBand",
+    "test:all": "npm run test:unit && npm run test:e2e",
     "lint": "eslint src/"
   },
   "repository": {
@@ -28,6 +32,7 @@
     "copy-webpack-plugin": "^13.0.1",
     "eslint": "^9.39.2",
     "jest": "^30.2.0",
+    "puppeteer": "^24.36.0",
     "sharp": "^0.34.5",
     "webpack": "^5.104.1",
     "webpack-cli": "^6.0.1"
