@@ -36,6 +36,7 @@ Job Autofill is a Chrome extension that intelligently detects and fills job appl
 ### From Source (Development)
 1. Clone this repository: `git clone https://github.com/jpalat/applinator.git`
 2. Run `npm install` to install dependencies
+   - **Note:** Puppeteer (~300MB) is optional and only needed for E2E tests, not for building
 3. Run `npm run build` to build the extension
 4. Open Chrome and navigate to `chrome://extensions`
 5. Enable "Developer mode" (toggle in top right)
@@ -231,12 +232,24 @@ npm run build
 # Build for development (with watch mode)
 npm run dev
 
-# Run tests
-npm test
+# Run unit tests
+npm run test:unit
+
+# Run E2E tests (requires Puppeteer - optional dependency)
+npm run test:e2e
+
+# Run all tests
+npm run test:all
 
 # Lint code
 npm run lint
 ```
+
+**Note on E2E Tests:**
+- Puppeteer (~300MB) is an optional dependency only needed for E2E tests
+- Not required for building or using the extension
+- Install with: `npm install` (already done above)
+- See `tests/e2e/README.md` for detailed setup instructions
 
 ### Project Structure
 ```

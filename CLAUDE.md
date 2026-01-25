@@ -110,21 +110,11 @@ The `getFieldSignals()` function extracts all identifying information from a fie
 - Repeats for up to 5 work experiences
 - Handles timing issues with `waitForElement()` utility
 
-#### Resume Parsing
-
-`src/background/resume-parser.js` uses pdf.js to extract text from PDFs:
-- Section detection (EXPERIENCE, EDUCATION, SKILLS, CONTACT)
-- Date parsing (handles "Jan 2020", "01/2020", "Present")
-- Email/phone extraction via regex
-- Company, title, school, degree extraction
-- Returns structured profile object
-
-**Note**: Resume parsing moved to client-side (options page) in recent commits to avoid service worker issues.
 
 ### Data Flow
 
 ```
-User uploads PDF
+User uploads resume
   → Options page sends to background service worker
   → resume-parser.js extracts text and parses sections
   → Returns structured profile object
@@ -241,8 +231,7 @@ The extension supports forms inside iframes (including nested iframes). The cont
 1. **Service Worker Context**: Background script cannot access DOM or window
 2. **Async Message Passing**: Always `return true` in message listeners for async responses
 3. **Content Script Timing**: Use `document_idle` to ensure page is loaded
-4. **PDF.js Worker**: Worker file must be copied to dist/ via webpack
-5. **CommonJS Modules**: Project uses `require()` not ES6 imports due to Webpack config
+4. **CommonJS Modules**: Project uses `require()` not ES6 imports due to Webpack config
 
 ## Build Output
 
@@ -253,7 +242,6 @@ Webpack bundles into `dist/`:
 - `options.js`, `options.html`, `options.css` - Options page
 - `manifest.json` - Extension manifest
 - `icons/` - Extension icons
-- `pdf.worker.min.mjs` - PDF.js worker
 
 ## Issue Tracking
 

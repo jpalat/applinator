@@ -10,6 +10,22 @@ Puppeteer-based E2E tests for the Job Autofill Chrome extension. These tests ver
 
 ## Requirements
 
+### Installing Puppeteer
+
+**Puppeteer is an optional dependency (~300MB).** It's only required for E2E tests, not for building the extension.
+
+```bash
+# Install Puppeteer (one-time setup for E2E tests)
+npm install
+
+# Or install temporarily without saving
+npm install --no-save puppeteer
+```
+
+**Note:** If you only want to build the extension, you don't need Puppeteer. Running `npm install` will skip optional dependencies if they fail.
+
+### Display Server
+
 **Important:** These tests require a display server because Chrome Manifest V3 service workers don't fully support headless mode.
 
 ### Local Development (with GUI)
@@ -71,6 +87,21 @@ npm run test:all
 - **Screenshots:** Saved to `tests/e2e/screenshots/` (gitignored)
 
 ## Troubleshooting
+
+### "Puppeteer is not installed"
+
+**Cause:** Puppeteer is an optional dependency and wasn't installed.
+
+**Solution:**
+```bash
+# Install Puppeteer
+npm install
+
+# Or install temporarily
+npm install --no-save puppeteer
+```
+
+Puppeteer downloads ~300MB Chromium browser and is only needed for E2E tests, not for building the extension.
 
 ### "Extension service worker not found"
 
